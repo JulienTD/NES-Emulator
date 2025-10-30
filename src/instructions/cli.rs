@@ -1,0 +1,40 @@
+use crate::cpu6502::{CPU, StatusFlag};
+
+impl CPU {
+    pub(crate) fn handleCLI(& mut self, value: u8) -> u8 {
+        self.set_status_flag(StatusFlag::InterruptDisable, false);
+        return 0;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::cpu6502::new_cpu;
+
+    #[test]
+    fn test_cli_clears_interrupt_disable_flag() {
+        let mut cpu = new_cpu();
+        // Set carry bit then execute CLC
+        cpu.set_status_flag(StatusFlag::InterruptDisable, true);
+        let extra = cpu.handleCLI(0);
+        assert_eq!(cpu.get_status_flag(StatusFlag::InterruptDisable), false);
+        assert_eq!(extra, 0);
+    }
+
+    #[test]
+    fn test_cli_does_not_affect_other_flags() {
+        let mut cpu = new_cpu();
+        // Set multiple flags
+        cpu.set_status_flag(StatusFlag::InterruptDisable, true);
+        cpu.set_status_flag(StatusFlag::Zero, true);
+        cpu.set_status_flag(StatusFlag::Negative, true);
+
+        cpu.handleCLI(0);
+
+        // Carry cleared, others unchanged
+        assert_eq!(cpu.get_status_flag(StatusFlag::InterruptDisable), false);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
+    }
+}

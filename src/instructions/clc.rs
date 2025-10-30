@@ -1,0 +1,40 @@
+use crate::cpu6502::{CPU, StatusFlag};
+
+impl CPU {
+    pub(crate) fn handleCLC(& mut self, value: u8) -> u8 {
+        self.set_status_flag(StatusFlag::Carry, false);
+        return 0;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::cpu6502::new_cpu;
+
+    #[test]
+    fn test_clc_clears_carry_flag() {
+        let mut cpu = new_cpu();
+        // Set carry bit then execute CLC
+        cpu.set_status_flag(StatusFlag::Carry, true);
+        let extra = cpu.handleCLC(0);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
+        assert_eq!(extra, 0);
+    }
+
+    #[test]
+    fn test_clc_does_not_affect_other_flags() {
+        let mut cpu = new_cpu();
+        // Set multiple flags
+        cpu.set_status_flag(StatusFlag::Carry, true);
+        cpu.set_status_flag(StatusFlag::Zero, true);
+        cpu.set_status_flag(StatusFlag::Negative, true);
+
+        cpu.handleCLC(0);
+
+        // Carry cleared, others unchanged
+        assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
+    }
+}
