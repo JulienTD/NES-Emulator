@@ -1,0 +1,38 @@
+use crate::cpu6502::CPU;
+
+impl CPU {
+    pub(crate) fn handleSEC(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+        self.set_status_flag(crate::cpu6502::StatusFlag::Carry, true);
+        return 0;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::cpu6502::new_cpu;
+    #[test]
+    fn test_sec_sets_carry_flag() {
+        let mut cpu = new_cpu();
+        // Clear carry bit then execute SEC
+        cpu.set_status_flag(crate::cpu6502::StatusFlag::Carry, false);
+        let extra = cpu.handleSEC(None, None);
+        assert_eq!(cpu.get_status_flag(crate::cpu6502::StatusFlag::Carry), true);
+        assert_eq!(extra, 0);
+    }
+    #[test]
+    fn test_sec_does_not_affect_other_flags() {
+        let mut cpu = new_cpu();
+        // Set multiple flags
+        cpu.set_status_flag(crate::cpu6502::StatusFlag::Carry, false);
+        cpu.set_status_flag(crate::cpu6502::StatusFlag::Zero, true);
+        cpu.set_status_flag(crate::cpu6502::StatusFlag::Negative, true);
+
+        cpu.handleSEC(None, None);
+
+        // Carry set, others unchanged
+        assert_eq!(cpu.get_status_flag(crate::cpu6502::StatusFlag::Carry), true);
+        assert_eq!(cpu.get_status_flag(crate::cpu6502::StatusFlag::Zero), true);
+        assert_eq!(cpu.get_status_flag(crate::cpu6502::StatusFlag::Negative), true);
+    }
+}
