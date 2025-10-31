@@ -1,7 +1,8 @@
 use crate::cpu6502::{CPU, StatusFlag};
 
 impl CPU {
-    pub(crate) fn handleCMP(& mut self, value: u8) -> u8 {
+    pub(crate) fn handleCMP(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+        let value = opt_value.expect("BUG: memory value of CMP should be present");
         let result = self.accumulator.wrapping_sub(value);
 
         // The status of the flags after comparison can be determined as follows:
@@ -25,19 +26,19 @@ mod tests {
         cpu.accumulator = 0x50;
 
         // Test A > M
-        cpu.handleCMP(0x30);
+        cpu.handleCMP(Some(0x30), None);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
 
         // Test A == M
-        cpu.handleCMP(0x50);
+        cpu.handleCMP(Some(0x50), None);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
 
         // Test A < M
-        cpu.handleCMP(0x70);
+        cpu.handleCMP(Some(0x70), None);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);

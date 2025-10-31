@@ -1,7 +1,8 @@
 use crate::cpu6502::{CPU, StatusFlag};
 
 impl CPU {
-    pub(crate) fn handleEOR(& mut self, value: u8) -> u8 {
+    pub(crate) fn handleEOR(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+        let value = opt_value.expect("BUG: memory value of EOR should be present");
         let result = self.accumulator ^ value;
         self.accumulator = result;
         self.set_status_flag(StatusFlag::Zero, result == 0);
@@ -21,7 +22,7 @@ mod tests {
 
         // Test result > 0
         cpu.accumulator = 0b10101010;
-        let extra = cpu.handleEOR(0b01010101);
+        let extra = cpu.handleEOR(Some(0b01010101), None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.accumulator, 0b11111111);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -29,7 +30,7 @@ mod tests {
 
         // Test result == 0
         cpu.accumulator = 0b11110000;
-        let extra = cpu.handleEOR(0b11110000);
+        let extra = cpu.handleEOR(Some(0b11110000), None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.accumulator, 0b00000000);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -37,7 +38,7 @@ mod tests {
 
         // Test result < 0
         cpu.accumulator = 0b00001111;
-        let extra = cpu.handleEOR(0b11110000);
+        let extra = cpu.handleEOR(Some(0b11110000), None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.accumulator, 0b11111111);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);

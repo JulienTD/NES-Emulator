@@ -1,7 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
 
 impl CPU {
-    pub(crate) fn handleCLV(& mut self, value: u8) -> u8 {
+    pub(crate) fn handleCLV(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
         self.set_status_flag(StatusFlag::Overflow, false);
         return 0;
     }
@@ -17,7 +17,7 @@ mod tests {
         let mut cpu = new_cpu();
         // Set carry bit then execute CLC
         cpu.set_status_flag(StatusFlag::Overflow, true);
-        let extra = cpu.handleCLV(0);
+        let extra = cpu.handleCLV(None, None);
         assert_eq!(cpu.get_status_flag(StatusFlag::Overflow), false);
         assert_eq!(extra, 0);
     }
@@ -30,7 +30,7 @@ mod tests {
         cpu.set_status_flag(StatusFlag::Zero, true);
         cpu.set_status_flag(StatusFlag::Negative, true);
 
-        cpu.handleCLV(0);
+        cpu.handleCLV(None, None);
 
         // Carry cleared, others unchanged
         assert_eq!(cpu.get_status_flag(StatusFlag::Overflow), false);

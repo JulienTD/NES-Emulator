@@ -97,7 +97,7 @@ pub fn new_cpu() -> CPU {
 pub struct Operand {
     opcode: u8,
     name: &'static str,
-    handler: fn(&mut CPU, u8) -> u8,
+    handler: fn(&mut CPU, Option<u8>, Option<u16>) -> u8,
     addressing_mode: AddressingMode,
     bytes: u8,
     cycles: u8,
@@ -297,26 +297,20 @@ impl CPU {
 
             if let Some(operand_info) = Self::OPERAND_MAP.get(&opcode) {
                 // Fetch operand based on addressing mode
-                let operand_value = match operand_info.addressing_mode {
-                    AddressingMode::Immediate => {
-                        // For immediate addressing, read the immediate byte but don't advance PC here.
-                        // We'll advance PC uniformly after executing by (bytes - 1).
-                        self.read_u8(self.program_counter)
-                    }
-                    AddressingMode::Accumulator => self.accumulator,
+                let (operand_value, operand_address) = match operand_info.addressing_mode {
+                    AddressingMode::Implicit => (None, None),
+                    AddressingMode::Accumulator => (Some(self.accumulator), None),
                     _ => {
                         let addr = self.get_operand_address(operand_info.addressing_mode);
-                        self.read_u8(addr)
+                        (Some(self.read_u8(addr)), Some(addr))
                     }
                 };
 
                 // TODO: Handle the cycles better for page crossing in addressing modes that require it.
                 //       Move the additional cycle of the branch instructions into this new logic.
 
-                // TODO 2: Change the operand value to an optional. If the addressing mode is Accumulator or Implicit,
-                //         we don't need to fetch any operand value.
                 // Execute the instruction and collect any additional cycles the handler returns
-                let handler_extra = (operand_info.handler)(self, operand_value);
+                let handler_extra = (operand_info.handler)(self, operand_value, operand_address);
 
                 // Add base cycles plus any additional cycles reported by handler
                 self.cycles += operand_info.cycles as u64 + handler_extra as u64;

@@ -1,7 +1,8 @@
 use crate::cpu6502::{CPU, StatusFlag};
 
 impl CPU {
-    pub(crate) fn handleDEC(& mut self, value: u8) -> u8 {
+    pub(crate) fn handleDEC(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+        let value = opt_value.expect("BUG: memory value of DEC should be present");
         let result = value.wrapping_sub(1);
 
         self.set_status_flag(StatusFlag::Zero, result == 0);
@@ -20,19 +21,19 @@ mod tests {
         let mut cpu = crate::cpu6502::new_cpu();
 
         // Test result > 0
-        let extra = cpu.handleDEC(0x02);
+        let extra = cpu.handleDEC(Some(0x02), None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
 
         // Test result == 0
-        let extra = cpu.handleDEC(0x01);
+        let extra = cpu.handleDEC(Some(0x01), None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
 
         // Test result < 0
-        let extra = cpu.handleDEC(0x00);
+        let extra = cpu.handleDEC(Some(0x00), None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
