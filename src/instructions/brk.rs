@@ -1,7 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
 
 impl CPU {
-    pub(crate) fn handleBRK(& mut self, value: u8) -> u8 {
+    pub(crate) fn handleBRK(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
         // // Set the Break flag before pushing status
         // self.set_status_flag(StatusFlag::Break, true);
         // self.push_u16(self.program_counter + 1); // Push return address (PC + 1)

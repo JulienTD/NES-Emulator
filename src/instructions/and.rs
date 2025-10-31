@@ -1,7 +1,8 @@
 use crate::cpu6502::{CPU, StatusFlag};
 
 impl CPU {
-    pub(crate) fn handleAND(& mut self, value: u8) -> u8 {
+    pub(crate) fn handleAND(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+        let value = opt_value.expect("BUG: memory value of AND should be present");
         let result = self.accumulator & value;
 
         // Set Zero flag (Z) - set if result = 0
@@ -24,7 +25,7 @@ mod tests {
     fn test_and_instruction() {
         let mut cpu = new_cpu();
         cpu.accumulator = 0xF0;
-        cpu.handleAND(0x0F);
+        cpu.handleAND(Some(0x0F), None);
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
@@ -34,7 +35,7 @@ mod tests {
     fn test_and_negative_result() {
         let mut cpu = new_cpu();
         cpu.accumulator = 0xFF;
-        cpu.handleAND(0x80);
+        cpu.handleAND(Some(0x80), None);
         assert_eq!(cpu.accumulator, 0x80);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
@@ -44,7 +45,7 @@ mod tests {
     fn test_and_no_flags_set() {
         let mut cpu = new_cpu();
         cpu.accumulator = 0x7F;
-        cpu.handleAND(0x3F);
+        cpu.handleAND(Some(0x3F), None);
         assert_eq!(cpu.accumulator, 0x3F);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);

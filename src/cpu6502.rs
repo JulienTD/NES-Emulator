@@ -97,7 +97,7 @@ pub fn new_cpu() -> CPU {
 pub struct Operand {
     opcode: u8,
     name: &'static str,
-    handler: fn(&mut CPU, u8) -> u8,
+    handler: fn(&mut CPU, Option<u8>, Option<u16>) -> u8,
     addressing_mode: AddressingMode,
     bytes: u8,
     cycles: u8,
@@ -178,6 +178,61 @@ impl CPU {
 
         // CLD Instructions
         0xD8 => Operand { opcode: 0xD8, name: "CLD", handler: CPU::handleCLD, addressing_mode: AddressingMode::Implicit, bytes: 1, cycles: 2 },
+
+        // CLI Instructions
+        0x58 => Operand { opcode: 0x58, name: "CLI", handler: CPU::handleCLI, addressing_mode: AddressingMode::Implicit, bytes: 1, cycles: 2 },
+
+        // CLV Instructions
+        0xB8 => Operand { opcode: 0xB8, name: "CLV", handler: CPU::handleCLV, addressing_mode: AddressingMode::Implicit, bytes: 1, cycles: 2 },
+
+        // CMP Instructions
+        0xC9 => Operand { opcode: 0xC9, name: "CMP", handler: CPU::handleCMP, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
+        0xC5 => Operand { opcode: 0xC5, name: "CMP", handler: CPU::handleCMP, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
+        0xD5 => Operand { opcode: 0xD5, name: "CMP", handler: CPU::handleCMP, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
+        0xCD => Operand { opcode: 0xCD, name: "CMP", handler: CPU::handleCMP, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 4 },
+        0xDD => Operand { opcode: 0xDD, name: "CMP", handler: CPU::handleCMP, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
+        0xD9 => Operand { opcode: 0xD9, name: "CMP", handler: CPU::handleCMP, addressing_mode: AddressingMode::AbsoluteY, bytes: 3, cycles: 4 /* +1 if page crossed */ },
+        0xC1 => Operand { opcode: 0xC1, name: "CMP", handler: CPU::handleCMP, addressing_mode: AddressingMode::IndirectX, bytes: 2, cycles: 6 },
+        0xD1 => Operand { opcode: 0xD1, name: "CMP", handler: CPU::handleCMP, addressing_mode: AddressingMode::IndirectY, bytes: 2, cycles: 5 /* +1 if page crossed */ },
+
+        // CPX Instructions
+        0xE0 => Operand { opcode: 0xE0, name: "CPX", handler: CPU::handleCPX, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
+        0xE4 => Operand { opcode: 0xE4, name: "CPX", handler: CPU::handleCPX, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
+        0xEC => Operand { opcode: 0xEC, name: "CPX", handler: CPU::handleCPX, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 4 },
+
+        // CPY Instructions
+        0xC0 => Operand { opcode: 0xC0, name: "CPY", handler: CPU::handleCPY, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
+        0xC4 => Operand { opcode: 0xC4, name: "CPY", handler: CPU::handleCPY, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
+        0xCC => Operand { opcode: 0xCC, name: "CPY", handler: CPU::handleCPY, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 4 },
+
+        // DEC Instructions
+        0xC6 => Operand { opcode: 0xC6, name: "DEC", handler: CPU::handleDEC, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 5 },
+        0xD6 => Operand { opcode: 0xD6, name: "DEC", handler: CPU::handleDEC, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 6 },
+        0xCE => Operand { opcode: 0xCE, name: "DEC", handler: CPU::handleDEC, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 6 },
+        0xDE => Operand { opcode: 0xDE, name: "DEC", handler: CPU::handleDEC, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 7 },
+
+        // DEX Instructions
+        0xCA => Operand { opcode: 0xCA, name: "DEX", handler: CPU::handleDEX, addressing_mode: AddressingMode::Implicit, bytes: 1, cycles: 2 },
+
+        // DEY Instructions
+        0x88 => Operand { opcode: 0x88, name: "DEY", handler: CPU::handleDEY, addressing_mode: AddressingMode::Implicit, bytes: 1, cycles: 2 },
+
+        // EOR Instructions
+        0x49 => Operand { opcode: 0x49, name: "EOR", handler: CPU::handleEOR, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
+        0x45 => Operand { opcode: 0x45, name: "EOR", handler: CPU::handleEOR, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
+        0x55 => Operand { opcode: 0x55, name: "EOR", handler: CPU::handleEOR, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
+        0x4D => Operand { opcode: 0x4D, name: "EOR", handler: CPU::handleEOR, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 4 },
+        0x5D => Operand { opcode: 0x5D, name: "EOR", handler: CPU::handleEOR, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
+        0x59 => Operand { opcode: 0x59, name: "EOR", handler: CPU::handleEOR, addressing_mode: AddressingMode::AbsoluteY, bytes: 3, cycles: 4 /* +1 if page crossed */ },
+        0x41 => Operand { opcode: 0x41, name: "EOR", handler: CPU::handleEOR, addressing_mode: AddressingMode::IndirectX, bytes: 2, cycles: 6 },
+        0x51 => Operand { opcode: 0x51, name: "EOR", handler: CPU::handleEOR, addressing_mode: AddressingMode::IndirectY, bytes: 2, cycles: 5 /* +1 if page crossed */ },
+
+        // INC Instructions
+        0xE6 => Operand { opcode: 0xE6, name: "INC", handler: CPU::handleINC, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 5 },
+        0xF6 => Operand { opcode: 0xF6, name: "INC", handler: CPU::handleINC, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 6 },
+        0xEE => Operand { opcode: 0xEE, name: "INC", handler: CPU::handleINC, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 6 },
+        0xFE => Operand { opcode: 0xFE, name: "INC", handler: CPU::handleINC, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 7  },
+
     };
 
     pub(crate) fn read_u8(&self, addr: u16) -> u8 {
@@ -242,21 +297,20 @@ impl CPU {
 
             if let Some(operand_info) = Self::OPERAND_MAP.get(&opcode) {
                 // Fetch operand based on addressing mode
-                let operand_value = match operand_info.addressing_mode {
-                    AddressingMode::Immediate => {
-                        // For immediate addressing, read the immediate byte but don't advance PC here.
-                        // We'll advance PC uniformly after executing by (bytes - 1).
-                        self.read_u8(self.program_counter)
-                    }
-                    AddressingMode::Accumulator => self.accumulator,
+                let (operand_value, operand_address) = match operand_info.addressing_mode {
+                    AddressingMode::Implicit => (None, None),
+                    AddressingMode::Accumulator => (Some(self.accumulator), None),
                     _ => {
                         let addr = self.get_operand_address(operand_info.addressing_mode);
-                        self.read_u8(addr)
+                        (Some(self.read_u8(addr)), Some(addr))
                     }
                 };
 
+                // TODO: Handle the cycles better for page crossing in addressing modes that require it.
+                //       Move the additional cycle of the branch instructions into this new logic.
+
                 // Execute the instruction and collect any additional cycles the handler returns
-                let handler_extra = (operand_info.handler)(self, operand_value);
+                let handler_extra = (operand_info.handler)(self, operand_value, operand_address);
 
                 // Add base cycles plus any additional cycles reported by handler
                 self.cycles += operand_info.cycles as u64 + handler_extra as u64;

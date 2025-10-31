@@ -1,7 +1,8 @@
 use crate::cpu6502::{CPU, StatusFlag};
 
 impl CPU {
-    pub(crate) fn handleBit(& mut self, value: u8) -> u8 {
+    pub(crate) fn handleBit(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+        let value = opt_value.expect("BUG: memory value of BIT should be present");
         // Perform bitwise AND between accumulator and memory operand
         let result = self.accumulator & value;
 
@@ -28,7 +29,7 @@ mod tests {
         let mut cpu = new_cpu();
         cpu.accumulator = 0xF0;
         // value has no overlapping bits with accumulator
-        cpu.handleBit(0x0F);
+        cpu.handleBit(Some(0x0F), None);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
         // V and N should reflect bits 6 and 7 of the operand
         assert_eq!(cpu.get_status_flag(StatusFlag::Overflow), false);
@@ -40,7 +41,7 @@ mod tests {
         let mut cpu = new_cpu();
         cpu.accumulator = 0xFF;
         // operand has bit 6 and bit 7 set
-        cpu.handleBit(0xC0); // 0b1100_0000
+        cpu.handleBit(Some(0xC0), None); // 0b1100_0000
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Overflow), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
@@ -50,7 +51,7 @@ mod tests {
     fn test_bit_does_not_change_accumulator() {
         let mut cpu = new_cpu();
         cpu.accumulator = 0xAA;
-        cpu.handleBit(0xFF);
+        cpu.handleBit(Some(0xFF), None);
         assert_eq!(cpu.accumulator, 0xAA);
     }
 }
