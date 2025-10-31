@@ -39,9 +39,10 @@ mod tests {
 
         // Check PC jump
         assert_eq!(cpu.program_counter, 0x1234, "PC should jump to the interrupt vector address");
-        // Check stack content
-        assert_eq!(cpu.pop_u8(), 0b0011_0000, "Status with B and U flags set should be on stack");
-        assert_eq!(cpu.pop_u16(), 0x8002, "PC+2 should be on stack");
+        // Check stack content (LIFO - Last In, First Out)
+        // Status was pushed last, so it's popped first.
+        assert_eq!(cpu.pop_u8(), 0b0011_0000, "Status with B and U flags set should be popped first");
+        assert_eq!(cpu.pop_u16(), 0x8002, "PC+2 should be popped second");
         // Check Interrupt Disable flag
         assert!(cpu.get_status_flag(StatusFlag::InterruptDisable), "Interrupt Disable flag should be set");
     }

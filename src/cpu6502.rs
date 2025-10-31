@@ -44,7 +44,8 @@ pub(crate) struct CPU {
     // 0x4020 - 0x5FFF: Expansion ROM
     // 0x6000 - 0x7FFF: Save RAM
     // 0x8000 - 0xFFFF: PRG ROM
-    memory: [u8; 0xFFFF],
+    // Total memory size: 64KB; 0xFFFF + 1 = 65536 bytes = 0x10000 to include all addresses.
+    memory: [u8; 0x10000],
     // Global cycle counter (counts CPU cycles executed)
     pub cycles: u64,
 }
@@ -88,7 +89,7 @@ pub fn new_cpu() -> CPU {
         x_register: 0x00,
         y_register: 0x00,
         status_register: 0x00,
-        memory: [0; 0xFFFF],
+        memory: [0; 0x10000],
         cycles: 0,
     }
 }
@@ -610,8 +611,8 @@ mod tests {
         assert_eq!(cpu.x_register, 0x00);
         assert_eq!(cpu.y_register, 0x00);
         assert_eq!(cpu.status_register, 0x00);
-        assert_eq!(cpu.memory.len(), 0xFFFF);
-        for i in 0..0xFFFF {
+        assert_eq!(cpu.memory.len(), 0x10000);
+        for i in 0..0x10000 {
             assert_eq!(cpu.memory[i], 0x00);
         }
     }
