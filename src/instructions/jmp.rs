@@ -35,6 +35,6 @@ mod tests {
         cpu.write_u8(0x1000, 0xAB);
 
         let target_address = cpu.get_operand_address(AddressingMode::Indirect, 0x8000);
-        assert_eq!(target_address, 0xABCD, "The emulated 6502 indirect JMP bug should be present");
+        assert_eq!(target_address, (0xABCD, false), "The emulated 6502 indirect JMP bug should be present");
     }
 }

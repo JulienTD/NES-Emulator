@@ -3,6 +3,7 @@ use crate::cpu6502::{CPU, StatusFlag};
 impl CPU {
     pub(crate) fn handleDEX(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let result = self.x_register.wrapping_sub(1);
+        self.x_register = result;
 
         self.set_status_flag(StatusFlag::Zero, result == 0);
         self.set_status_flag(StatusFlag::Negative, result & 0x80 != 0 );
@@ -23,6 +24,7 @@ mod tests {
         cpu.x_register = 0x02;
         let extra = cpu.handleDEX(None, None);
         assert_eq!(extra, 0);
+        assert_eq!(cpu.x_register, 0x01);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
 
@@ -30,6 +32,7 @@ mod tests {
         cpu.x_register = 0x01;
         let extra = cpu.handleDEX(None, None);
         assert_eq!(extra, 0);
+        assert_eq!(cpu.x_register, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
 
@@ -37,6 +40,7 @@ mod tests {
         cpu.x_register = 0x00;
         let extra = cpu.handleDEX(None, None);
         assert_eq!(extra, 0);
+        assert_eq!(cpu.x_register, 0xFF);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
     }

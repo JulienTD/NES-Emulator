@@ -18,7 +18,7 @@ mod tests {
         cpu.program_counter = 0x1000;
         cpu.set_status_flag(StatusFlag::Overflow, true); // Overflow set// Branch forward by 16
         let cycles = cpu.handleBVS(Some(0x10), None); // Branch forward by 16
-        assert_eq!(cpu.program_counter, 0x1010);
+        assert_eq!(cpu.program_counter, 0x1012);
         assert_eq!(cycles, 1);
     }
 
@@ -38,7 +38,7 @@ mod tests {
         cpu.program_counter = 0x10F0;
         cpu.set_status_flag(StatusFlag::Overflow, true);
         let cycles = cpu.handleBVS(Some(0x20), None);
-        assert_eq!(cpu.program_counter, 0x1110);
+        assert_eq!(cpu.program_counter, 0x1112);
         assert_eq!(cycles, 2);
     }
 }
