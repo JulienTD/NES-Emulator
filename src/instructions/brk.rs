@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleBRK(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -30,7 +32,7 @@ mod tests {
 
     #[test]
     fn test_brk_instruction() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.program_counter = 0x8000;
         // Set the interrupt vector at 0xFFFE to point to 0x1234
         cpu.write_u16(0xFFFE, 0x1234);

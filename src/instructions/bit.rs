@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleBit(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -26,7 +28,7 @@ mod tests {
 
     #[test]
     fn test_bit_sets_zero_flag_when_and_zero() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0xF0;
         // value has no overlapping bits with accumulator
         cpu.handleBit(Some(0x0F), None);
@@ -38,7 +40,7 @@ mod tests {
 
     #[test]
     fn test_bit_sets_overflow_and_negative_from_operand() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0xFF;
         // operand has bit 6 and bit 7 set
         cpu.handleBit(Some(0xC0), None); // 0b1100_0000
@@ -49,7 +51,7 @@ mod tests {
 
     #[test]
     fn test_bit_does_not_change_accumulator() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0xAA;
         cpu.handleBit(Some(0xFF), None);
         assert_eq!(cpu.accumulator, 0xAA);

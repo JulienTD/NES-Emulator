@@ -1,4 +1,6 @@
 use crate::cpu6502::CPU;
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleJSR(& mut self, _opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
@@ -22,7 +24,7 @@ mod tests {
 
     #[test]
     fn test_jsr_pushes_return_address_and_jumps() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.program_counter = 0x8000; // JSR is at 0x8000
         cpu.handleJSR(None, Some(0x1234));
 

@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleBCC(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -14,7 +16,7 @@ mod tests {
 
     #[test]
     fn test_bcc_branch_taken() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.program_counter = 0x1000;
         cpu.set_status_flag(StatusFlag::Carry, false); // Clear Carry flag
         let cycles = cpu.handleBCC(Some(0x10), None); // Branch forward by 16
@@ -24,7 +26,7 @@ mod tests {
 
     #[test]
     fn test_bcc_branch_not_taken() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.program_counter = 0x1000;
         cpu.set_status_flag(StatusFlag::Carry, true); // Set Carry flag
         let cycles = cpu.handleBCC(Some(0x10), None); // Attempt to branch forward by 16
@@ -34,7 +36,7 @@ mod tests {
 
     #[test]
     fn test_bcc_page_crossing() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.program_counter = 0x10F0;
         cpu.set_status_flag(StatusFlag::Carry, false); // Clear Carry flag
         let cycles = cpu.handleBCC(Some(0x20), None); // Branch forward by 32 (crosses page)

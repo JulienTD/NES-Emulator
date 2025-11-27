@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::rom::Rom;
+use crate::bus::Bus;
 
 impl CPU {
     pub(crate) fn handleINY(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -17,7 +19,7 @@ mod tests {
 
     #[test]
     fn test_iny_increments_x_register() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.y_register = 0x10;
         cpu.handleINY(None, None);
         assert_eq!(cpu.y_register, 0x11);
@@ -25,7 +27,7 @@ mod tests {
 
     #[test]
     fn test_iny_sets_zero_flag() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.y_register = 0xFF;
         cpu.handleINY(None, None);
         assert!(cpu.get_status_flag(StatusFlag::Zero));
@@ -35,7 +37,7 @@ mod tests {
 
     #[test]
     fn test_iny_sets_negative_flag() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.y_register = 0x7F;
         cpu.handleINY(None, None);
         assert!(cpu.get_status_flag(StatusFlag::Negative));

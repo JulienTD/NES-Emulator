@@ -1,4 +1,6 @@
 use crate::cpu6502::CPU;
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleSEC(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -13,7 +15,7 @@ mod tests {
     use crate::cpu6502::new_cpu;
     #[test]
     fn test_sec_sets_carry_flag() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         // Clear carry bit then execute SEC
         cpu.set_status_flag(crate::cpu6502::StatusFlag::Carry, false);
         let extra = cpu.handleSEC(None, None);
@@ -22,7 +24,7 @@ mod tests {
     }
     #[test]
     fn test_sec_does_not_affect_other_flags() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         // Set multiple flags
         cpu.set_status_flag(crate::cpu6502::StatusFlag::Carry, false);
         cpu.set_status_flag(crate::cpu6502::StatusFlag::Zero, true);

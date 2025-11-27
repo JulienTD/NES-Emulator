@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleASL(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -26,7 +28,7 @@ mod tests {
     // ASL Instruction Tests
     #[test]
     fn test_asl_instruction() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x40;
         cpu.handleASL(Some(0x40), None);
         assert_eq!(cpu.accumulator, 0x80);
@@ -37,7 +39,7 @@ mod tests {
 
     #[test]
     fn test_asl_sets_carry_flag() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x80;
         cpu.handleASL(Some(0x80), None);
         assert_eq!(cpu.accumulator, 0x00);

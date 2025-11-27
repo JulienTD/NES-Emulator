@@ -1,4 +1,6 @@
 use crate::cpu6502::CPU;
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleSTY(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -15,7 +17,7 @@ mod tests {
 
     #[test]
     fn test_sty_stores_y_register_in_memory() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         let address = 0x0200;
         cpu.y_register = 0x42;
         let initial_status = cpu.status_register;

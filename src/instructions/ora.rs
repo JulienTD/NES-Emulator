@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleORA(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -17,7 +19,7 @@ mod tests {
     use crate::cpu6502::new_cpu;
     #[test]
     fn test_ora_sets_accumulator() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0b0000_1100;
         cpu.handleORA(Some(0b0000_0011), None);
         assert_eq!(cpu.accumulator, 0b0000_1111);
@@ -26,7 +28,7 @@ mod tests {
     }
     #[test]
     fn test_ora_sets_zero_flag() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0b0000_0000;
         cpu.handleORA(Some(0b0000_0000), None);
         assert_eq!(cpu.accumulator, 0b0000_0000);
@@ -35,7 +37,7 @@ mod tests {
     }
     #[test]
     fn test_ora_sets_negative_flag() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0b0000_0001;
         cpu.handleORA(Some(0b1000_0000), None);
         assert_eq!(cpu.accumulator, 0b1000_0001);

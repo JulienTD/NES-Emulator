@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handlePLA(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -19,7 +21,7 @@ mod tests {
 
     #[test]
     fn test_pla_pulls_value_and_sets_flags() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         // Manually push a value to the stack to be pulled
         cpu.push_u8(0x42);
         assert_eq!(cpu.stack_pointer, 0xFE);
@@ -34,7 +36,7 @@ mod tests {
 
     #[test]
     fn test_pla_sets_zero_flag() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.push_u8(0x00);
         cpu.handlePLA(None, None);
         assert_eq!(cpu.accumulator, 0x00);
@@ -44,7 +46,7 @@ mod tests {
 
     #[test]
     fn test_pla_sets_negative_flag() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.push_u8(0x80);
         cpu.handlePLA(None, None);
         assert_eq!(cpu.accumulator, 0x80);
