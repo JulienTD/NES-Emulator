@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleCLV(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
@@ -14,7 +16,7 @@ mod tests {
 
     #[test]
     fn test_cli_clears_interrupt_disable_flag() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         // Set carry bit then execute CLC
         cpu.set_status_flag(StatusFlag::Overflow, true);
         let extra = cpu.handleCLV(None, None);
@@ -24,7 +26,7 @@ mod tests {
 
     #[test]
     fn test_cli_does_not_affect_other_flags() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         // Set multiple flags
         cpu.set_status_flag(StatusFlag::Overflow, true);
         cpu.set_status_flag(StatusFlag::Zero, true);

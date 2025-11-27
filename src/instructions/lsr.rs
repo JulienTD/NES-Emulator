@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleLSR(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
@@ -34,7 +36,7 @@ mod tests {
 
     #[test]
     fn test_lsr_accumulator() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0b0000_0011; // Value is 3, bit 0 is 1
         cpu.handleLSR(Some(cpu.accumulator), None);
         assert_eq!(cpu.accumulator, 0b0000_0001); // Result is 1
@@ -45,7 +47,7 @@ mod tests {
 
     #[test]
     fn test_lsr_memory() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         let address = 0x0200;
         cpu.write_u8(address, 0b1000_0010); // Value is 130, bit 0 is 0
         cpu.handleLSR(Some(0b1000_0010), Some(address));

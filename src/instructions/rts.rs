@@ -1,4 +1,6 @@
 use crate::cpu6502::CPU;
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleRTS(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -17,7 +19,7 @@ mod tests {
 
     #[test]
     fn test_rts_returns_from_subroutine() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         // Simulate a JSR call by pushing a return address (minus one) to the stack.
         // If JSR was at 0x8000, it would push 0x8002. The return address is 0x8003.
         cpu.push_u16(0x8002);

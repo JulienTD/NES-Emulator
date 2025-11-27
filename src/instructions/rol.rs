@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleROL(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
@@ -36,7 +38,7 @@ mod tests {
 
     #[test]
     fn test_rol_accumulator_with_carry() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.set_status_flag(StatusFlag::Carry, true); // Set initial carry
         cpu.accumulator = 0b1010_1010;
         cpu.handleROL(Some(cpu.accumulator), None);
@@ -49,7 +51,7 @@ mod tests {
 
     #[test]
     fn test_rol_memory_no_carry() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         let address = 0x0200;
         cpu.write_u8(address, 0b0101_0101);
         cpu.set_status_flag(StatusFlag::Carry, false); // Clear initial carry

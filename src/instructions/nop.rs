@@ -1,4 +1,6 @@
 use crate::cpu6502::CPU;
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleNOP(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -14,7 +16,7 @@ mod tests {
 
     #[test]
     fn test_nop_does_nothing() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         // Set some initial state to ensure it doesn't change
         cpu.accumulator = 0xAA;
         cpu.x_register = 0xBB;

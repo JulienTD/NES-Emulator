@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleINC(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
@@ -20,7 +22,7 @@ mod tests {
 
     #[test]
     fn test_inc_increments_value() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         let address = 0x2000;
         cpu.write_u8(address, 0x05);
 
@@ -33,7 +35,7 @@ mod tests {
 
     #[test]
     fn test_inc_wraps_around() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         let address = 0x2000;
         cpu.write_u8(address, 0xFF);
 
@@ -46,7 +48,7 @@ mod tests {
 
     #[test]
     fn test_inc_sets_flags_correctly() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         let address = 0x2000;
 
         // Test result > 0

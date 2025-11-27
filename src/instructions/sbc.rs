@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleSBC(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -49,7 +51,7 @@ mod tests {
 
     #[test]
     fn test_sbc_basic_subtraction() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x10;
         cpu.set_status_flag(StatusFlag::Carry, true); // No borrow
         cpu.handleSBC(Some(0x05), None);
@@ -60,7 +62,7 @@ mod tests {
 
     #[test]
     fn test_sbc_with_borrow() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x10;
         cpu.set_status_flag(StatusFlag::Carry, false); // With borrow
         cpu.handleSBC(Some(0x05), None);
@@ -70,7 +72,7 @@ mod tests {
 
     #[test]
     fn test_sbc_causes_borrow_and_overflow() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x80; // -128
         cpu.set_status_flag(StatusFlag::Carry, true); // No borrow
         cpu.handleSBC(Some(0x01), None); // -128 - 1 = -129 (overflows to +127)

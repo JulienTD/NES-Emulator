@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handlePHP(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -19,7 +21,7 @@ mod tests {
 
     #[test]
     fn test_php_pushes_status_to_stack() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.set_status_flag(StatusFlag::Carry, true); // Set C to 1
         cpu.set_status_flag(StatusFlag::Negative, true); // Set N to 1
         // Initial status is 0b1000_0001

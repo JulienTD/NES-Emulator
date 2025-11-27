@@ -1,4 +1,6 @@
 use crate::cpu6502::CPU;
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleJMP(& mut self, _opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
@@ -15,14 +17,14 @@ mod tests {
 
     #[test]
     fn test_jmp_sets_program_counter() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.handleJMP( None, Some(0x1234));
         assert_eq!(cpu.program_counter, 0x1234);
     }
 
     #[test]
     fn test_jmp_indirect_with_page_boundary_bug() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.program_counter = 0x8000;
 
         // The indirect vector is at a page boundary: 0x10FF

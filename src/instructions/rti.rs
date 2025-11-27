@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleRTI(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -24,7 +26,7 @@ mod tests {
 
     #[test]
     fn test_rti_restores_status_and_pc() {
-        let mut cpu = new_cpu();
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         let return_address = 0x1234;
         let status_on_stack = 0b1011_0101; // A status with B and U flags set
 

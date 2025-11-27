@@ -1,4 +1,6 @@
 use crate::cpu6502::{CPU, StatusFlag};
+use crate::bus::Bus;
+use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handleCPX(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
@@ -22,7 +24,7 @@ mod tests {
 
     #[test]
     fn test_cpx_sets_flags_correctly() {
-        let mut cpu = crate::cpu6502::new_cpu();
+        let mut cpu = crate::cpu6502::new_cpu(Bus::new(Rom::test_rom()));
         cpu.x_register = 0x50;
 
         // Test X > M
