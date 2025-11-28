@@ -559,7 +559,7 @@ impl CPU {
         additional_cycles
     }
 
-        // Helper to get effective address based on addressing mode
+    // Helper to get effective address based on addressing mode
     pub(crate) fn get_operand_address(&self, mode: AddressingMode, addr: u16) -> (u16, bool) {
         match mode {
             AddressingMode::Absolute => (self.read_u16(addr), false),
@@ -757,10 +757,6 @@ mod tests {
             StatusFlag::Overflow,
             StatusFlag::Negative,
         ] {
-            // Initially should be false
-            assert_eq!(cpu.get_status_flag(flag), false,
-                "flag {:?} should start as false", flag);
-
             // Set the bit directly and verify get_status_flag reads it
             cpu.status_register |= 1 << (flag as u8);
             assert_eq!(cpu.get_status_flag(flag), true,
@@ -788,10 +784,6 @@ mod tests {
             StatusFlag::Overflow,
             StatusFlag::Negative,
         ] {
-            // Initially should be false
-            assert_eq!(cpu.status_register & (1 << (flag as u8)), 0,
-                "flag {:?} bit should start as 0", flag);
-
             // Set to true and verify bit is set directly in status_register
             cpu.set_status_flag(flag, true);
             assert_eq!(cpu.status_register & (1 << (flag as u8)), 1 << (flag as u8),
@@ -884,8 +876,8 @@ mod tests {
         );
 
         // 5. Indirect: (JMP only, never has "page cross penalty" logic here)
-        cpu.write_u16(instruction_ptr + 12, 0x2000); // Pointer location
-        cpu.write_u16(0x2000, 0x5634); // Pointer value
+        cpu.write_u16(instruction_ptr + 12, 0x1000); // Pointer location
+        cpu.write_u16(0x1000, 0x5634); // Pointer value
         assert_eq!(
             cpu.get_operand_address(AddressingMode::Indirect, instruction_ptr + 12),
             (0x5634, false)
@@ -903,19 +895,19 @@ mod tests {
         // 7. IndirectY: (Can cross)
         // Case A: No Cross
         cpu.write_u8(instruction_ptr + 16, 0x30); // Zero page addr
-        cpu.write_u16(0x30, 0x2000); // Pointer points to 0x2000
+        cpu.write_u16(0x30, 0x1000); // Pointer points to 0x1000
         cpu.y_register = 0x10;
         assert_eq!(
             cpu.get_operand_address(AddressingMode::IndirectY, instruction_ptr + 16),
-            (0x2010, false)
+            (0x1010, false)
         );
         // Case B: Page Cross
         cpu.write_u8(instruction_ptr + 17, 0x32); // Zero page addr
-        cpu.write_u16(0x32, 0x20FF); // Pointer points to 0x20FF
+        cpu.write_u16(0x32, 0x10FF); // Pointer points to 0x10FF
         cpu.y_register = 0x01;
         assert_eq!(
             cpu.get_operand_address(AddressingMode::IndirectY, instruction_ptr + 17),
-            (0x2100, true) // <--- Expect True (0x20FF + 1 crosses to 0x21xx)
+            (0x1100, true) // <--- Expect True (0x10FF + 1 crosses to 0x11xx)
         );
 
         // 8. Relative: (Calculated in branch(), so this just returns target)
@@ -936,6 +928,32 @@ mod tests {
         cpu.write_u8(instruction_ptr + 21, 0x42);
         cpu.y_register = 0x09;
         assert_eq!(cpu.get_operand_address(AddressingMode::ZeroPageY, instruction_ptr + 21), (0x004B, false));
+    }
+
+    #[test]
+    fn test_get_operand_address_indirect_page_bug() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+
+        // The Pointer LOCATION (The Instruction Operand)
+        // We choose 0x0200, which is safe CPU RAM (0x0000-0x07FF).
+        // We store the pointer address ($00FF) there.
+        cpu.write_u8(0x0200, 0xFF);
+        cpu.write_u8(0x0201, 0x00);
+
+        // The Pointer VALUE (The Target)
+        // Now we setup the data at $00FF so the bug can happen.
+        // LSB at $00FF: 0x34
+        cpu.write_u8(0x00FF, 0x34);
+
+        // The Page Boundary Bug
+        // MSB should be read from $0100, but due to bug, it wraps to $0000.
+        cpu.write_u8(0x0000, 0x12); // Expected MSB
+        cpu.write_u8(0x0100, 0x99); // "Correct" but ignored MSB
+
+        // We pass 0x0200, where we stored the pointer ($00FF).
+        let (target_address, _) = cpu.get_operand_address(AddressingMode::Indirect, 0x0200);
+
+        assert_eq!(target_address, 0x1234, "Indirect addressing did not simulate page boundary bug correctly");
     }
 
     #[test]

@@ -37,9 +37,17 @@ mod tests {
         cpu.handleRTI(None, None);
 
         assert_eq!(cpu.program_counter, return_address, "Program counter should be restored");
-        // The status register should be 0b1000_0101. C, Z, and N are set from the stack,
-        // but B and U are ignored and retain their original (0) value.
-        assert_eq!(cpu.status_register, 0b1000_0101, "Status register should be restored, ignoring B and U flags");
+
+        // The status register should be 0b1010_0101 (165).
+        // N (Bit 7) = 1 (From Stack)
+        // V (Bit 6) = 0 (From Stack)
+        // U (Bit 5) = 1 (FORCED HIGH by hardware nature)
+        // B (Bit 4) = 0 (FORCED LOW, B flag never exists in register)
+        // D (Bit 3) = 0 (From Stack)
+        // I (Bit 2) = 1 (From Stack)
+        // Z (Bit 1) = 0 (From Stack)
+        // C (Bit 0) = 1 (From Stack)
+        assert_eq!(cpu.status_register, 0b1010_0101, "Status register should be restored, B ignored, U set high");
         assert_eq!(cpu.stack_pointer, 0xFF, "Stack pointer should be restored to its original state");
     }
 }

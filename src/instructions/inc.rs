@@ -23,7 +23,7 @@ mod tests {
     #[test]
     fn test_inc_increments_value() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
-        let address = 0x2000;
+        let address = 0x0000;
         cpu.write_u8(address, 0x05);
 
         let extra = cpu.handleINC(Some(0x05), Some(address));
@@ -36,7 +36,7 @@ mod tests {
     #[test]
     fn test_inc_wraps_around() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
-        let address = 0x2000;
+        let address = 0x1FFF;
         cpu.write_u8(address, 0xFF);
 
         let extra = cpu.handleINC(Some(0xFF), Some(address));
@@ -49,7 +49,7 @@ mod tests {
     #[test]
     fn test_inc_sets_flags_correctly() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
-        let address = 0x2000;
+        let address = 0x0000;
 
         // Test result > 0
         cpu.write_u8(address, 0x05);
