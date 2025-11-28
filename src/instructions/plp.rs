@@ -33,9 +33,17 @@ mod tests {
 
         cpu.handlePLP(None, None);
 
-        // The status register should be 0b10000001. C and N are set from the stack,
-        // but B and U are ignored and retain their original (0) value.
-        assert_eq!(cpu.status_register, 0b10000001);
+        // The status register should be:
+        // N=1 (From Stack)
+        // V=0 (From Stack)
+        // U=1 (Ignored from Stack, but kept as 1 from CPU state)
+        // B=0 (Ignored from Stack, B flag is 0 in register)
+        // D=0 (From Stack)
+        // I=0 (From Stack)
+        // Z=0 (From Stack)
+        // C=1 (From Stack)
+        // Result: 10100001
+        assert_eq!(cpu.status_register, 0b10100001);
         assert_eq!(cpu.stack_pointer, 0xFF, "Stack pointer should increment");
     }
 }

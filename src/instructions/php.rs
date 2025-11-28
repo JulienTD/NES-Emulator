@@ -24,7 +24,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.set_status_flag(StatusFlag::Carry, true); // Set C to 1
         cpu.set_status_flag(StatusFlag::Negative, true); // Set N to 1
-        // Initial status is 0b1000_0001
+        cpu.set_status_flag(StatusFlag::InterruptDisable, false); // Ensure I is cleared so initial status is 0b1000_0001
 
         cpu.handlePHP(None, None);
 

@@ -34,16 +34,17 @@ mod tests {
     fn test_brk_instruction() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.program_counter = 0x8000;
-        // Set the interrupt vector at 0xFFFE to point to 0x1234
-        cpu.write_u16(0xFFFE, 0x1234);
+        // Read the interrupt vector at 0xFFFE from the PRG ROM (test ROM is read-only)
+        let expected_vector = cpu.read_u16(0xFFFE);
 
         cpu.handleBRK(None, None);
 
         // Check PC jump
-        assert_eq!(cpu.program_counter, 0x1234, "PC should jump to the interrupt vector address");
+        assert_eq!(cpu.program_counter, expected_vector, "PC should jump to the interrupt vector address");
         // Check stack content (LIFO - Last In, First Out)
         // Status was pushed last, so it's popped first.
-        assert_eq!(cpu.pop_u8(), 0b0011_0000, "Status with B and U flags set should be popped first");
+        // The CPU starts with Interrupt Disable (I) set, so pushed status includes B, U and I.
+        assert_eq!(cpu.pop_u8(), 0b0011_0100, "Status with B, U and I flags set should be popped first");
         assert_eq!(cpu.pop_u16(), 0x8002, "PC+2 should be popped second");
         // Check Interrupt Disable flag
         assert!(cpu.get_status_flag(StatusFlag::InterruptDisable), "Interrupt Disable flag should be set");
