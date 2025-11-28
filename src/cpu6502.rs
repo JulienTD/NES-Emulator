@@ -728,7 +728,9 @@ pub fn trace(cpu: &mut CPU) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::bus::Bus;
+    use crate::cpu6502::{AddressingMode, new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_cpu_init() {

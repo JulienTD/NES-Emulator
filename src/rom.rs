@@ -152,6 +152,7 @@ impl Rom {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub(crate) fn test_rom() -> Rom {
         let header = NesHeader {
             magic_numbers: [0x4E, 0x45, 0x53, 0x1A], // "NES" + EOF

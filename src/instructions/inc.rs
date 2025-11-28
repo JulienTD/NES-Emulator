@@ -1,6 +1,4 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handle_inc(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
@@ -17,8 +15,9 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_inc_increments_value() {

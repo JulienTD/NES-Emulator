@@ -1,6 +1,4 @@
 use crate::cpu6502::CPU;
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handle_jsr(& mut self, _opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
@@ -19,8 +17,10 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+
+    use crate::bus::Bus;
     use crate::cpu6502::new_cpu;
+    use crate::rom::Rom;
 
     #[test]
     fn test_jsr_pushes_return_address_and_jumps() {

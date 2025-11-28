@@ -1,6 +1,4 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handle_ora(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -15,8 +13,10 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
+
     #[test]
     fn test_ora_sets_accumulator() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));

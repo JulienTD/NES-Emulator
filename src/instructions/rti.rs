@@ -1,6 +1,4 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
     pub(crate) fn handle_rti(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -21,8 +19,10 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+
+    use crate::bus::Bus;
     use crate::cpu6502::new_cpu;
+    use crate::rom::Rom;
 
     #[test]
     fn test_rti_restores_status_and_pc() {

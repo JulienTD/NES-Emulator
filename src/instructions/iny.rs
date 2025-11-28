@@ -1,6 +1,4 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::rom::Rom;
-use crate::bus::Bus;
 
 impl CPU {
     pub(crate) fn handle_iny(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
@@ -14,8 +12,9 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_iny_increments_x_register() {
