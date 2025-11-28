@@ -20,7 +20,7 @@ mod tests {
 
     #[test]
     fn test_dex_sets_flags_correctly() {
-        let mut cpu = crate::cpu6502::new_cpu(Bus::new(Rom::test_rom()));
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
 
         // Test result > 0
         cpu.x_register = 0x02;

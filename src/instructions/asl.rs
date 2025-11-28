@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleASL(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handleASL(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
         let value = opt_value.expect("BUG: memory value of ASL should be present");
         let result = value << 1;
 
@@ -16,7 +16,13 @@ impl CPU {
         // Set Negative flag (N) - set if bit 7 of result is set
         self.set_status_flag(StatusFlag::Negative, (result & 0x80) != 0);
 
-        self.accumulator = result;
+        // Only write to Accumulator if address is None (Accumulator Mode).
+        // Otherwise, write back to the memory address provided.
+        if let Some(address) = opt_address {
+            self.write_u8(address, result);
+        } else {
+            self.accumulator = result;
+        }
         return 0;
     }
 }
@@ -46,5 +52,18 @@ mod tests {
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
+    }
+
+    #[test]
+    fn test_asl_address_mode() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.accumulator = 0x00;
+        cpu.write_u8(0x10, 0x00);
+        cpu.handleASL(Some(0x40), Some(0x10));
+        assert_eq!(cpu.accumulator, 0x00);
+        assert_eq!(cpu.read_u8(0x10), 0x80);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
     }
 }

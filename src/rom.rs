@@ -1,7 +1,3 @@
-use std::fs::File;
-use std::io::{self, BufReader, Read};
-use std::fs;
-
 const HEADER_SIZE: usize = 16;
 const MAGIC_NUMBERS: &[u8; 4] = b"NES\x1a";
 
@@ -57,22 +53,12 @@ impl Rom {
             reserved: [rom_data[11], rom_data[12], rom_data[13], rom_data[14], rom_data[15]],
         };
 
-        // Bit 0: Mirroring (0=Vertical, 1=Horizontal)
-        // Bit 3: Four Screen VRAM
-        let mirroring = if (header.flags_6 & 0b1000) != 0 {
-            Mirroring::FourScreen
-        } else if (header.flags_6 & 0b0001) != 0 {
-            Mirroring::Horizontal
-        } else {
-            Mirroring::Vertical
-        };
-
         // Bit 4-7 of Byte 6 are the LOWER 4 bits of the Mapper
         // Bit 4-7 of Byte 7 are the UPPER 4 bits of the Mapper
         let mapper = (header.flags_7 & 0b1111_0000) | (header.flags_6 >> 4);
 
-        // If true, the game has a Save File (SRAM) at 0x6000
-        let has_battery = (header.flags_6 & 0b0000_0010) != 0;
+        // // If true, the game has a Save File (SRAM) at 0x6000
+        // let has_battery = (header.flags_6 & 0b0000_0010) != 0;
 
         // If true, we must skip the first 512 bytes of the ROM input
         let has_trainer = (header.flags_6 & 0b0000_0100) != 0;
@@ -80,22 +66,35 @@ impl Rom {
         // If true, the cartridge uses four-screen VRAM layout
         let four_screen = (header.flags_6 & 0b0000_1000) != 0;
 
+        // If true, the mirroring is horizontal instead of vertical
+        let mirrored = (header.flags_6 & 0b0000_0001) != 0;
+
+        // Bit 0: Mirroring (0=Vertical, 1=Horizontal)
+        // Bit 3: Four Screen VRAM
+        let mirroring = if four_screen {
+            Mirroring::FourScreen
+        } else if mirrored {
+            Mirroring::Horizontal
+        } else {
+            Mirroring::Vertical
+        };
+
         // Determine where the actual ROM data starts
         // The header is 16 bytes.
-        let prg_rom_start = HEADER_SIZE + if (header.flags_6 & 0b0100) != 0 {
+        let prg_rom_start = HEADER_SIZE + if has_trainer {
             512 // Skip "Trainer" data if bit 2 is set
         } else {
             0
         };
 
         // Slice the PRG ROM (Program Code)
-        let prg_rom_len: usize = header.prg_rom_size as usize * 16384; // 16KB units
-        let prg_rom = rom_data[prg_rom_start .. (prg_rom_start + prg_rom_len)].to_vec();
+        // let prg_rom_len: usize = header.prg_rom_size as usize * 16384; // 16KB units
+        // let prg_rom = rom_data[prg_rom_start .. (prg_rom_start + prg_rom_len)].to_vec();
 
-        // Slice the CHR ROM (Graphics)
-        let chr_rom_start = prg_rom_start + prg_rom_len;
-        let chr_rom_len = header.chr_rom_size as usize * 8192; // 8KB units
-        let chr_rom = rom_data[chr_rom_start .. (chr_rom_start + chr_rom_len)].to_vec();
+        // // Slice the CHR ROM (Graphics)
+        // let chr_rom_start = prg_rom_start + prg_rom_len;
+        // let chr_rom_len = header.chr_rom_size as usize * 8192; // 8KB units
+        // let chr_rom = rom_data[chr_rom_start .. (chr_rom_start + chr_rom_len)].to_vec();
 
         return Ok(Rom {
             header,

@@ -91,7 +91,7 @@ pub fn new_cpu(bus: Bus) -> CPU {
         accumulator: 0x00,
         x_register: 0x00,
         y_register: 0x00,
-        status_register: 0x00,
+        status_register: 0x24, // 0010 0100 (Unused + Interrupt Disable)
         bus,
         cycles: 0,
     }
@@ -471,7 +471,7 @@ impl CPU {
     pub(crate) fn reset(&mut self) {
         self.accumulator = 0;
         self.x_register = 0;
-        self.status_register = 0;
+        self.status_register = 0x24; // 0010 0100 (Unused + Interrupt Disable)
         self.stack_pointer = CPU::STACK_ADDRESS_DEFAULT_WARM_START;
 
         // 0xFFFC corresponds to the reset vector address.
@@ -739,7 +739,7 @@ mod tests {
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.x_register, 0x00);
         assert_eq!(cpu.y_register, 0x00);
-        assert_eq!(cpu.status_register, 0x00);
+        assert_eq!(cpu.status_register, 0x24);
     }
 
     #[test]
@@ -920,7 +920,6 @@ mod tests {
 
         // 8. Relative: (Calculated in branch(), so this just returns target)
         cpu.write_u8(instruction_ptr + 18, 0x10);
-        let target = instruction_ptr + 18 + 1 + 0x10;
         assert_eq!(
             cpu.get_operand_address(AddressingMode::Relative, instruction_ptr + 18),
             (instruction_ptr + 18, false)
