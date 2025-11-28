@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleRTS(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_rts(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         // RTS pulls the return address (minus one) from the stack, increments it,
         // and then sets the program counter to that address.
         let return_address_minus_one = self.pop_u16();
@@ -25,7 +25,7 @@ mod tests {
         cpu.push_u16(0x8002);
         assert_eq!(cpu.stack_pointer, 0xFD);
 
-        cpu.handleRTS(None, None);
+        cpu.handle_rts(None, None);
 
         assert_eq!(cpu.program_counter, 0x8003, "PC should be set to the return address + 1");
         assert_eq!(cpu.stack_pointer, 0xFF, "Stack pointer should be restored");

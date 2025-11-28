@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleBVS(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_bvs(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let value = opt_value.expect("BUG: memory value of BVS should be present");
         self.branch(self.get_status_flag(StatusFlag::Overflow), value as i8)
     }
@@ -19,7 +19,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.program_counter = 0x1000;
         cpu.set_status_flag(StatusFlag::Overflow, true); // Overflow set// Branch forward by 16
-        let cycles = cpu.handleBVS(Some(0x10), None); // Branch forward by 16
+        let cycles = cpu.handle_bvs(Some(0x10), None); // Branch forward by 16
         assert_eq!(cpu.program_counter, 0x1012);
         assert_eq!(cycles, 1);
     }
@@ -29,7 +29,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.program_counter = 0x1000;
         cpu.set_status_flag(StatusFlag::Overflow, false); // Overflow clear
-        let cycles = cpu.handleBVS(Some(0x10), None);
+        let cycles = cpu.handle_bvs(Some(0x10), None);
         assert_eq!(cpu.program_counter, 0x1000);
         assert_eq!(cycles, 0);
     }
@@ -39,7 +39,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.program_counter = 0x10F0;
         cpu.set_status_flag(StatusFlag::Overflow, true);
-        let cycles = cpu.handleBVS(Some(0x20), None);
+        let cycles = cpu.handle_bvs(Some(0x20), None);
         assert_eq!(cpu.program_counter, 0x1112);
         assert_eq!(cycles, 2);
     }

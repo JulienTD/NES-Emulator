@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleROR(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_ror(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
         let value = opt_value.expect("BUG: memory value of ROR should be present");
 
         // Get the current carry flag value to be rotated into bit 7
@@ -41,7 +41,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.set_status_flag(StatusFlag::Carry, true); // Set initial carry
         cpu.accumulator = 0b0101_0101;
-        cpu.handleROR(Some(cpu.accumulator), None);
+        cpu.handle_ror(Some(cpu.accumulator), None);
 
         assert_eq!(cpu.accumulator, 0b1010_1010, "Result should be rotated with carry as new bit 7");
         assert!(cpu.get_status_flag(StatusFlag::Carry), "New carry should be set from old bit 0");
@@ -55,7 +55,7 @@ mod tests {
         let address = 0x0200;
         cpu.write_u8(address, 0b1010_1010);
         cpu.set_status_flag(StatusFlag::Carry, false); // Clear initial carry
-        cpu.handleROR(Some(0b1010_1010), Some(address));
+        cpu.handle_ror(Some(0b1010_1010), Some(address));
 
         assert_eq!(cpu.read_u8(address), 0b0101_0101, "Result should be rotated with 0 as new bit 7");
         assert!(!cpu.get_status_flag(StatusFlag::Carry), "New carry should be clear from old bit 0");

@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleBRK(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_brk(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         // 1. Push Program Counter + 2 to the stack
         // (PC is incremented by 2 to account for the BRK instruction and its padding byte)
         self.push_u16(self.program_counter + 2);
@@ -37,7 +37,7 @@ mod tests {
         // Read the interrupt vector at 0xFFFE from the PRG ROM (test ROM is read-only)
         let expected_vector = cpu.read_u16(0xFFFE);
 
-        cpu.handleBRK(None, None);
+        cpu.handle_brk(None, None);
 
         // Check PC jump
         assert_eq!(cpu.program_counter, expected_vector, "PC should jump to the interrupt vector address");

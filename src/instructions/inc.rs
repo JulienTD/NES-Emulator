@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleINC(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_inc(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
         let value = opt_value.expect("BUG: memory value of INC should be present");
         let address = opt_address.expect("BUG: address of INC should be present");
 
@@ -26,7 +26,7 @@ mod tests {
         let address = 0x0000;
         cpu.write_u8(address, 0x05);
 
-        let extra = cpu.handleINC(Some(0x05), Some(address));
+        let extra = cpu.handle_inc(Some(0x05), Some(address));
         let result = cpu.read_u8(address);
 
         assert_eq!(result, 0x06);
@@ -39,7 +39,7 @@ mod tests {
         let address = 0x1FFF;
         cpu.write_u8(address, 0xFF);
 
-        let extra = cpu.handleINC(Some(0xFF), Some(address));
+        let extra = cpu.handle_inc(Some(0xFF), Some(address));
         let result = cpu.read_u8(address);
 
         assert_eq!(result, 0x00);
@@ -53,7 +53,7 @@ mod tests {
 
         // Test result > 0
         cpu.write_u8(address, 0x05);
-        let _extra = cpu.handleINC(Some(0x05), Some(address));
+        let _extra = cpu.handle_inc(Some(0x05), Some(address));
         let result = cpu.read_u8(address);
         assert_eq!(result, 0x06);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -61,7 +61,7 @@ mod tests {
 
         // Test result == 0
         cpu.write_u8(address, 0xFF);
-        let _extra = cpu.handleINC(Some(0xFF), Some(address));
+        let _extra = cpu.handle_inc(Some(0xFF), Some(address));
         let result = cpu.read_u8(address);
         assert_eq!(result, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -69,7 +69,7 @@ mod tests {
 
         // Test result < 0
         cpu.write_u8(address, 0x7F);
-        let _extra = cpu.handleINC(Some(0x7F), Some(address));
+        let _extra = cpu.handle_inc(Some(0x7F), Some(address));
         let result = cpu.read_u8(address);
         assert_eq!(result, 0x80);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);

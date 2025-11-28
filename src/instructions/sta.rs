@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleSTA(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_sta(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let address = _opt_address.expect("BUG: address of STA should be present");
         self.write_u8(address, self.accumulator);
         return 0;
@@ -22,7 +22,7 @@ mod tests {
         cpu.accumulator = 0x42;
         let initial_status = cpu.status_register;
 
-        let cycles = cpu.handleSTA(None, Some(address));
+        let cycles = cpu.handle_sta(None, Some(address));
 
         assert_eq!(cycles, 0, "STA should not return extra cycles");
         assert_eq!(cpu.read_u8(address), 0x42, "Accumulator value should be stored at the address");

@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleAND(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_and(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let value = opt_value.expect("BUG: memory value of AND should be present");
         let result = self.accumulator & value;
 
@@ -27,7 +27,7 @@ mod tests {
     fn test_and_instruction() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0xF0;
-        cpu.handleAND(Some(0x0F), None);
+        cpu.handle_and(Some(0x0F), None);
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
@@ -37,7 +37,7 @@ mod tests {
     fn test_and_negative_result() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0xFF;
-        cpu.handleAND(Some(0x80), None);
+        cpu.handle_and(Some(0x80), None);
         assert_eq!(cpu.accumulator, 0x80);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
@@ -47,7 +47,7 @@ mod tests {
     fn test_and_no_flags_set() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x7F;
-        cpu.handleAND(Some(0x3F), None);
+        cpu.handle_and(Some(0x3F), None);
         assert_eq!(cpu.accumulator, 0x3F);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);

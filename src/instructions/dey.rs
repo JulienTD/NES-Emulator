@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleDEY(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_dey(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let result = self.y_register.wrapping_sub(1);
         self.y_register = result;
 
@@ -24,7 +24,7 @@ mod tests {
 
         // Test result > 0
         cpu.y_register = 0x02;
-        let extra = cpu.handleDEY(None, None);
+        let extra = cpu.handle_dey(None, None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.y_register, 0x01);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -32,7 +32,7 @@ mod tests {
 
         // Test result == 0
         cpu.y_register = 0x01;
-        let extra = cpu.handleDEY(None, None);
+        let extra = cpu.handle_dey(None, None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.y_register, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -40,7 +40,7 @@ mod tests {
 
         // Test result < 0
         cpu.y_register = 0x00;
-        let extra = cpu.handleDEY(None, None);
+        let extra = cpu.handle_dey(None, None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.y_register, 0xFF);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
