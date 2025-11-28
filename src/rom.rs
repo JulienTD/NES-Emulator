@@ -2,6 +2,16 @@ const HEADER_SIZE: usize = 16;
 const MAGIC_NUMBERS: &[u8; 4] = b"NES\x1a";
 
 #[derive(Debug, PartialEq, Clone, Copy)]
+pub enum MapperType {
+    Nrom = 0,  // Mario, Donkey Kong, etc.
+    Mmc1 = 1,  // Zelda, Metroid
+    Uxrom = 2, // Castlevania, Mega Man
+    Cnrom = 3, // Cybernoid
+    Mmc3 = 4,  // Super Mario Bros 3
+    Unknown,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Mirroring {
     Vertical,
     Horizontal,
@@ -79,30 +89,65 @@ impl Rom {
             Mirroring::Vertical
         };
 
-        // Determine where the actual ROM data starts
-        // The header is 16 bytes.
-        let prg_rom_start = HEADER_SIZE + if has_trainer {
-            512 // Skip "Trainer" data if bit 2 is set
-        } else {
-            0
-        };
+        // Calculate the offset where PRG ROM actually begins.
+        // This accounts for the Header (16 bytes) AND the Trainer (512 bytes) if present.
+        let prg_rom_start = HEADER_SIZE + if has_trainer { 512 } else { 0 };
 
-        // Slice the PRG ROM (Program Code)
-        // let prg_rom_len: usize = header.prg_rom_size as usize * 16384; // 16KB units
-        // let prg_rom = rom_data[prg_rom_start .. (prg_rom_start + prg_rom_len)].to_vec();
+        // Calculate the size of the PRG ROM (16KB units)
+        let prg_rom_len = header.prg_rom_size as usize * 16384;
 
-        // // Slice the CHR ROM (Graphics)
-        // let chr_rom_start = prg_rom_start + prg_rom_len;
-        // let chr_rom_len = header.chr_rom_size as usize * 8192; // 8KB units
-        // let chr_rom = rom_data[chr_rom_start .. (chr_rom_start + chr_rom_len)].to_vec();
+        // Determine the end of PRG ROM / start of CHR ROM
+        let chr_rom_start = prg_rom_start + prg_rom_len;
+
+        // Calculate the size of CHR ROM (8KB units)
+        let chr_rom_len = header.chr_rom_size as usize * 8192;
 
         return Ok(Rom {
             header,
-            prg_rom: rom_data[HEADER_SIZE..(HEADER_SIZE + (header.prg_rom_size as usize * 16384))].to_vec(),
-            chr_rom: rom_data[(HEADER_SIZE + (header.prg_rom_size as usize * 16384))..].to_vec(),
+            prg_rom: rom_data[prg_rom_start..(prg_rom_start + prg_rom_len)].to_vec(),
+            chr_rom: rom_data[chr_rom_start..(chr_rom_start + chr_rom_len)].to_vec(),
             mirroring,
             mapper,
         });
+    }
+
+    // Returns the MapperType based on the mapper ID byte.
+    pub fn get_mapper_type(&self) -> MapperType {
+        match self.mapper {
+            0 => MapperType::Nrom,
+            1 => MapperType::Mmc1,
+            2 => MapperType::Uxrom,
+            3 => MapperType::Cnrom,
+            4 => MapperType::Mmc3,
+            _ => MapperType::Unknown,
+        }
+    }
+
+    // Performs a sanity check on the ROM to ensure it is playable by this emulator.
+    // This function should be called immediately after loading a ROM.
+    pub fn check_validity(&self) -> Result<(), String> {
+        // Check Magic Number
+        if self.header.magic_numbers != *MAGIC_NUMBERS {
+             return Err("Invalid ROM: Wrong magic numbers".to_string());
+        }
+
+        // Check Mapper Support
+        match self.get_mapper_type() {
+            MapperType::Nrom => {
+                // NROM specific checks:
+                // PRG ROM must be either 16KB (1 unit) or 32KB (2 units)
+                if self.header.prg_rom_size != 1 && self.header.prg_rom_size != 2 {
+                     return Err(format!("Invalid NROM PRG size: {} units (must be 1 or 2)", self.header.prg_rom_size));
+                }
+            }
+            MapperType::Unknown => {
+                return Err(format!("Unsupported Mapper: ID {}", self.mapper));
+            }
+            _ => {
+                return Err(format!("Mapper {} ({:?}) is not yet implemented", self.mapper, self.get_mapper_type()));
+            }
+        }
+        Ok(())
     }
 
     pub(crate) fn test_rom() -> Rom {

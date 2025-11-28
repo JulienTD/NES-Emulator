@@ -1,7 +1,8 @@
 mod cpu6502;
 mod instructions;
-pub mod rom;
+mod rom;
 mod bus;
+
 use crate::cpu6502::trace;
 use crate::cpu6502::{CPU};
 use crate::cpu6502::new_cpu;
@@ -12,6 +13,7 @@ use crate::bus::Bus;
 fn main() {
     let rom_data = std::fs::read("./nestest.nes").expect("Failed to read ROM file");
     let rom = Rom::parse_nes_rom(rom_data).expect("Failed to parse ROM");
+    rom.check_validity().expect("ROM validity check failed");
 
     // println!("ROM Loaded successfully!");
     // println!("PRG ROM Size: {} bytes", rom.prg_rom.len());
