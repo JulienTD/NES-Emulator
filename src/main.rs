@@ -3,7 +3,7 @@ mod instructions;
 pub mod rom;
 mod bus;
 use crate::cpu6502::trace;
-use crate::cpu6502::{CPU, StatusFlag};
+use crate::cpu6502::{CPU};
 use crate::cpu6502::new_cpu;
 use crate::rom::Rom;
 use crate::bus::Bus;
@@ -20,7 +20,7 @@ fn main() {
     // println!("Mirroring: {:?}", rom.mirroring);
     // println!("Header: {:?}", rom.header);
 
-    let mut bus = Bus::new(rom);
+    let bus = Bus::new(rom);
     let mut cpu: CPU = new_cpu(bus);
     cpu.reset();
     cpu.program_counter = 0xC000;

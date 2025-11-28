@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleCLV(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handleCLV(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         self.set_status_flag(StatusFlag::Overflow, false);
         return 0;
     }

@@ -3,7 +3,7 @@ use crate::bus::Bus;
 use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleEOR(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handleEOR(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let value = opt_value.expect("BUG: memory value of EOR should be present");
         let result = self.accumulator ^ value;
         self.accumulator = result;
@@ -20,7 +20,7 @@ mod tests {
 
     #[test]
     fn test_eor_sets_flags_correctly() {
-        let mut cpu = crate::cpu6502::new_cpu(Bus::new(Rom::test_rom()));
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
 
         // Test result > 0
         cpu.accumulator = 0b10101010;
