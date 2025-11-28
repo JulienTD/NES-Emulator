@@ -1,9 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleADC(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_adc(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let value = opt_value.expect("BUG: memory value of ADC should be present");
 
         // Get current carry flag and operands
@@ -42,14 +40,15 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_adc_instruction() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x14;
-        cpu.handleADC(Some(0x27), None);
+        cpu.handle_adc(Some(0x27), None);
         assert_eq!(cpu.accumulator, 0x3B);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -62,7 +61,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0xFF;
         cpu.set_status_flag(StatusFlag::Carry, true);
-        cpu.handleADC(Some(0x01), None);
+        cpu.handle_adc(Some(0x01), None);
         assert_eq!(cpu.accumulator, 0x01);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -74,7 +73,7 @@ mod tests {
     fn test_adc_overflow() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x7F;
-        cpu.handleADC(Some(0x01), None);
+        cpu.handle_adc(Some(0x01), None);
         assert_eq!(cpu.accumulator, 0x80);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -86,7 +85,7 @@ mod tests {
     fn test_adc_zero_result() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x00;
-        cpu.handleADC(Some(0x00), None);
+        cpu.handle_adc(Some(0x00), None);
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -98,7 +97,7 @@ mod tests {
     fn test_adc_negative_result() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x80;
-        cpu.handleADC(Some(0x00), None);
+        cpu.handle_adc(Some(0x00), None);
         assert_eq!(cpu.accumulator, 0x80);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -111,7 +110,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x50;
         cpu.set_status_flag(StatusFlag::Carry, true);
-        cpu.handleADC(Some(0x30), None);
+        cpu.handle_adc(Some(0x30), None);
         assert_eq!(cpu.accumulator, 0x81);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -123,7 +122,7 @@ mod tests {
     fn test_adc_max_values() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0xFF;
-        cpu.handleADC(Some(0xFF), None);
+        cpu.handle_adc(Some(0xFF), None);
         assert_eq!(cpu.accumulator, 0xFE);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -135,7 +134,7 @@ mod tests {
     fn test_adc_min_values() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x00;
-        cpu.handleADC(Some(0x00), None);
+        cpu.handle_adc(Some(0x00), None);
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -148,7 +147,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x7F;
         cpu.set_status_flag(StatusFlag::Carry, true);
-        cpu.handleADC(Some(0x01), None);
+        cpu.handle_adc(Some(0x01), None);
         assert_eq!(cpu.accumulator, 0x81);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -161,7 +160,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0xFF;
         cpu.set_status_flag(StatusFlag::Carry, true);
-        cpu.handleADC(Some(0x00), None);
+        cpu.handle_adc(Some(0x00), None);
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -173,7 +172,7 @@ mod tests {
     fn test_adc_large_value() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x10;
-        cpu.handleADC(Some(0xF0), None);
+        cpu.handle_adc(Some(0xF0), None);
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -185,7 +184,7 @@ mod tests {
     fn test_adc_no_flags_set() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x20;
-        cpu.handleADC(Some(0x10), None);
+        cpu.handle_adc(Some(0x10), None);
         assert_eq!(cpu.accumulator, 0x30);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -197,7 +196,7 @@ mod tests {
     fn test_adc_all_flags_set() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x7F;
-        cpu.handleADC(Some(0x80), None);
+        cpu.handle_adc(Some(0x80), None);
         assert_eq!(cpu.accumulator, 0xFF);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -210,7 +209,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0xFF;
         cpu.set_status_flag(StatusFlag::Carry, true);
-        cpu.handleADC(Some(0x00), None);
+        cpu.handle_adc(Some(0x00), None);
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -223,7 +222,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x80;
         cpu.set_status_flag(StatusFlag::Carry, true);
-        cpu.handleADC(Some(0x7F), None);
+        cpu.handle_adc(Some(0x7F), None);
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -235,7 +234,7 @@ mod tests {
     fn test_adc_with_overflow_and_negative() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x40;
-        cpu.handleADC(Some(0x40), None);
+        cpu.handle_adc(Some(0x40), None);
         assert_eq!(cpu.accumulator, 0x80);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -248,7 +247,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0xFF;
         cpu.set_status_flag(StatusFlag::Carry, true);
-        cpu.handleADC(Some(0x02), None);
+        cpu.handle_adc(Some(0x02), None);
         assert_eq!(cpu.accumulator, 0x02);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);

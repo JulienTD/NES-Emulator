@@ -1,9 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleROL(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_rol(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
         let value = opt_value.expect("BUG: memory value of ROL should be present");
 
         // Get the current carry flag value to be rotated into bit 0
@@ -33,15 +31,16 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_rol_accumulator_with_carry() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.set_status_flag(StatusFlag::Carry, true); // Set initial carry
         cpu.accumulator = 0b1010_1010;
-        cpu.handleROL(Some(cpu.accumulator), None);
+        cpu.handle_rol(Some(cpu.accumulator), None);
 
         assert_eq!(cpu.accumulator, 0b0101_0101, "Result should be rotated with carry as new bit 0");
         assert!(cpu.get_status_flag(StatusFlag::Carry), "New carry should be set from old bit 7");
@@ -55,7 +54,7 @@ mod tests {
         let address = 0x0200;
         cpu.write_u8(address, 0b0101_0101);
         cpu.set_status_flag(StatusFlag::Carry, false); // Clear initial carry
-        cpu.handleROL(Some(0b0101_0101), Some(address));
+        cpu.handle_rol(Some(0b0101_0101), Some(address));
 
         assert_eq!(cpu.read_u8(address), 0b1010_1010, "Result should be rotated with 0 as new bit 0");
         assert!(!cpu.get_status_flag(StatusFlag::Carry), "New carry should be clear from old bit 7");

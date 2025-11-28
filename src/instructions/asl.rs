@@ -1,9 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleASL(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_asl(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
         let value = opt_value.expect("BUG: memory value of ASL should be present");
         let result = value << 1;
 
@@ -29,14 +27,16 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
+
     // ASL Instruction Tests
     #[test]
     fn test_asl_instruction() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x40;
-        cpu.handleASL(Some(0x40), None);
+        cpu.handle_asl(Some(0x40), None);
         assert_eq!(cpu.accumulator, 0x80);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -47,7 +47,7 @@ mod tests {
     fn test_asl_sets_carry_flag() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x80;
-        cpu.handleASL(Some(0x80), None);
+        cpu.handle_asl(Some(0x80), None);
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), true);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -59,7 +59,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x00;
         cpu.write_u8(0x10, 0x00);
-        cpu.handleASL(Some(0x40), Some(0x10));
+        cpu.handle_asl(Some(0x40), Some(0x10));
         assert_eq!(cpu.accumulator, 0x00);
         assert_eq!(cpu.read_u8(0x10), 0x80);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);

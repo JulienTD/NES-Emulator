@@ -1,9 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handlePLA(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_pla(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let value = self.pop_u8();
         self.accumulator = value;
 
@@ -16,8 +14,9 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_pla_pulls_value_and_sets_flags() {
@@ -26,7 +25,7 @@ mod tests {
         cpu.push_u8(0x42);
         assert_eq!(cpu.stack_pointer, 0xFE);
 
-        cpu.handlePLA(None, None);
+        cpu.handle_pla(None, None);
 
         assert_eq!(cpu.accumulator, 0x42);
         assert_eq!(cpu.stack_pointer, 0xFF, "Stack pointer should increment");
@@ -38,7 +37,7 @@ mod tests {
     fn test_pla_sets_zero_flag() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.push_u8(0x00);
-        cpu.handlePLA(None, None);
+        cpu.handle_pla(None, None);
         assert_eq!(cpu.accumulator, 0x00);
         assert!(cpu.get_status_flag(StatusFlag::Zero));
         assert!(!cpu.get_status_flag(StatusFlag::Negative));
@@ -48,7 +47,7 @@ mod tests {
     fn test_pla_sets_negative_flag() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.push_u8(0x80);
-        cpu.handlePLA(None, None);
+        cpu.handle_pla(None, None);
         assert_eq!(cpu.accumulator, 0x80);
         assert!(!cpu.get_status_flag(StatusFlag::Zero));
         assert!(cpu.get_status_flag(StatusFlag::Negative));

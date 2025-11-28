@@ -1,9 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleSBC(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_sbc(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let value = opt_value.expect("BUG: memory value of SBC should be present");
 
         // SBC is implemented as ADC with the operand's bits inverted.
@@ -46,15 +44,16 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_sbc_basic_subtraction() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x10;
         cpu.set_status_flag(StatusFlag::Carry, true); // No borrow
-        cpu.handleSBC(Some(0x05), None);
+        cpu.handle_sbc(Some(0x05), None);
         assert_eq!(cpu.accumulator, 0x0B); // 16 - 5 = 11
         assert!(cpu.get_status_flag(StatusFlag::Carry)); // No borrow occurred
         assert!(!cpu.get_status_flag(StatusFlag::Overflow));
@@ -65,7 +64,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x10;
         cpu.set_status_flag(StatusFlag::Carry, false); // With borrow
-        cpu.handleSBC(Some(0x05), None);
+        cpu.handle_sbc(Some(0x05), None);
         assert_eq!(cpu.accumulator, 0x0A); // 16 - 5 - 1 = 10
         assert!(cpu.get_status_flag(StatusFlag::Carry)); // No borrow occurred
     }
@@ -75,7 +74,7 @@ mod tests {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.accumulator = 0x80; // -128
         cpu.set_status_flag(StatusFlag::Carry, true); // No borrow
-        cpu.handleSBC(Some(0x01), None); // -128 - 1 = -129 (overflows to +127)
+        cpu.handle_sbc(Some(0x01), None); // -128 - 1 = -129 (overflows to +127)
         assert_eq!(cpu.accumulator, 0x7F);
         assert!(cpu.get_status_flag(StatusFlag::Carry), "No borrow should occur");
         assert!(cpu.get_status_flag(StatusFlag::Overflow), "Overflow should be set");

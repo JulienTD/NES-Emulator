@@ -1,9 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleDEX(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_dex(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let result = self.x_register.wrapping_sub(1);
         self.x_register = result;
 
@@ -15,8 +13,9 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_dex_sets_flags_correctly() {
@@ -24,7 +23,7 @@ mod tests {
 
         // Test result > 0
         cpu.x_register = 0x02;
-        let extra = cpu.handleDEX(None, None);
+        let extra = cpu.handle_dex(None, None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.x_register, 0x01);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
@@ -32,7 +31,7 @@ mod tests {
 
         // Test result == 0
         cpu.x_register = 0x01;
-        let extra = cpu.handleDEX(None, None);
+        let extra = cpu.handle_dex(None, None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.x_register, 0x00);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
@@ -40,7 +39,7 @@ mod tests {
 
         // Test result < 0
         cpu.x_register = 0x00;
-        let extra = cpu.handleDEX(None, None);
+        let extra = cpu.handle_dex(None, None);
         assert_eq!(extra, 0);
         assert_eq!(cpu.x_register, 0xFF);
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);

@@ -1,9 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleTXA(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_txa(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         self.accumulator = self.x_register;
 
         self.set_status_flag(StatusFlag::Zero, self.accumulator == 0);
@@ -15,14 +13,15 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_txa_transfers_value_and_sets_flags() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.x_register = 0x42;
-        cpu.handleTXA(None, None);
+        cpu.handle_txa(None, None);
         assert_eq!(cpu.accumulator, 0x42);
         assert!(!cpu.get_status_flag(StatusFlag::Zero));
         assert!(!cpu.get_status_flag(StatusFlag::Negative));
@@ -32,7 +31,7 @@ mod tests {
     fn test_txa_sets_zero_flag() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.x_register = 0x00;
-        cpu.handleTXA(None, None);
+        cpu.handle_txa(None, None);
         assert_eq!(cpu.accumulator, 0x00);
         assert!(cpu.get_status_flag(StatusFlag::Zero));
         assert!(!cpu.get_status_flag(StatusFlag::Negative));
@@ -42,7 +41,7 @@ mod tests {
     fn test_txa_sets_negative_flag() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         cpu.x_register = 0x80;
-        cpu.handleTXA(None, None);
+        cpu.handle_txa(None, None);
         assert_eq!(cpu.accumulator, 0x80);
         assert!(!cpu.get_status_flag(StatusFlag::Zero));
         assert!(cpu.get_status_flag(StatusFlag::Negative));

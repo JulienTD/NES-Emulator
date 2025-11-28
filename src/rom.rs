@@ -19,6 +19,7 @@ pub enum Mirroring {
 }
 
 // NES file header structure (16 bytes)
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct NesHeader {
     // The first 4 bytes should be "NES" followed by 0x1A (4E 45 53 1A)
@@ -35,6 +36,7 @@ pub(crate) struct NesHeader {
 
 // ROM structure to hold NES ROM data
 // Parsing is performed by following the header description at this link: (https://formats.kaitai.io/ines/index.html)
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub(crate) struct Rom {
     pub header: NesHeader,
@@ -150,6 +152,7 @@ impl Rom {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub(crate) fn test_rom() -> Rom {
         let header = NesHeader {
             magic_numbers: [0x4E, 0x45, 0x53, 0x1A], // "NES" + EOF

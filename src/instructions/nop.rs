@@ -1,9 +1,7 @@
 use crate::cpu6502::CPU;
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleNOP(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_nop(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         // NOP does nothing.
         return 0;
     }
@@ -11,8 +9,10 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+
+    use crate::bus::Bus;
     use crate::cpu6502::new_cpu;
+    use crate::rom::Rom;
 
     #[test]
     fn test_nop_does_nothing() {
@@ -22,7 +22,7 @@ mod tests {
         cpu.x_register = 0xBB;
         cpu.status_register = 0b11001100;
 
-        let cycles = cpu.handleNOP(None, None);
+        let cycles = cpu.handle_nop(None, None);
 
         assert_eq!(cycles, 0, "NOP should not return extra cycles");
         assert_eq!(cpu.accumulator, 0xAA, "Accumulator should not change");

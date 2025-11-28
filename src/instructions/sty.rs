@@ -1,9 +1,7 @@
 use crate::cpu6502::CPU;
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleSTY(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_sty(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let address = _opt_address.expect("BUG: address of STY should be present");
         self.write_u8(address, self.y_register);
         return 0;
@@ -12,8 +10,10 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+
+    use crate::bus::Bus;
     use crate::cpu6502::new_cpu;
+    use crate::rom::Rom;
 
     #[test]
     fn test_sty_stores_y_register_in_memory() {
@@ -22,7 +22,7 @@ mod tests {
         cpu.y_register = 0x42;
         let initial_status = cpu.status_register;
 
-        let cycles = cpu.handleSTY(None, Some(address));
+        let cycles = cpu.handle_sty(None, Some(address));
 
         assert_eq!(cycles, 0, "STY should not return extra cycles");
         assert_eq!(cpu.read_u8(address), 0x42, "Y register value should be stored at the address");

@@ -1,9 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handlePHP(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_php(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         // When PHP is used, the status register is pushed to the stack
         // with the Break (B) and Unused (U) flags set to 1.
         let mut status = self.status_register;
@@ -16,8 +14,9 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_php_pushes_status_to_stack() {
@@ -26,7 +25,7 @@ mod tests {
         cpu.set_status_flag(StatusFlag::Negative, true); // Set N to 1
         cpu.set_status_flag(StatusFlag::InterruptDisable, false); // Ensure I is cleared so initial status is 0b1000_0001
 
-        cpu.handlePHP(None, None);
+        cpu.handle_php(None, None);
 
         let pushed_status = cpu.read_u8(0x01FF);
         // Expected status on stack: 0b1011_0001 (B and U flags are set)

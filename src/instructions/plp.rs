@@ -1,9 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handlePLP(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_plp(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let popped_status = self.pop_u8();
 
         // The B and U flags are not affected by PLP.
@@ -22,8 +20,10 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+
+    use crate::bus::Bus;
     use crate::cpu6502::new_cpu;
+    use crate::rom::Rom;
 
     #[test]
     fn test_plp_pulls_status_from_stack() {
@@ -31,7 +31,7 @@ mod tests {
         // Push a status with C=1, N=1, B=1, U=1 (0b10110001)
         cpu.push_u8(0b10110001);
 
-        cpu.handlePLP(None, None);
+        cpu.handle_plp(None, None);
 
         // The status register should be:
         // N=1 (From Stack)

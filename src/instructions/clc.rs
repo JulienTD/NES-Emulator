@@ -1,9 +1,7 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
-    pub(crate) fn handleCLC(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+    pub(crate) fn handle_clc(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         self.set_status_flag(StatusFlag::Carry, false);
         return 0;
     }
@@ -11,15 +9,16 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_clc_clears_carry_flag() {
         let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
         // Set carry bit then execute CLC
         cpu.set_status_flag(StatusFlag::Carry, true);
-        let extra = cpu.handleCLC(None, None);
+        let extra = cpu.handle_clc(None, None);
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
         assert_eq!(extra, 0);
     }
@@ -32,7 +31,7 @@ mod tests {
         cpu.set_status_flag(StatusFlag::Zero, true);
         cpu.set_status_flag(StatusFlag::Negative, true);
 
-        cpu.handleCLC(None, None);
+        cpu.handle_clc(None, None);
 
         // Carry cleared, others unchanged
         assert_eq!(cpu.get_status_flag(StatusFlag::Carry), false);
