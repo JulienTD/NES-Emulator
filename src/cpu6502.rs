@@ -1,6 +1,6 @@
 use phf::phf_map;
 use crate::bus::Bus;
-use crate::rom::Rom;
+use crate::Rom;
 
 #[derive(Debug)]
 pub(crate) struct CPU {
