@@ -1,0 +1,380 @@
+   Compiling Nes v0.1.0 (/home/julient/Projects/NES-Emulator)
+warning: fields `prg_ram_size`, `flags_9`, `flags_10`, and `reserved` are never read
+  --> src/rom.rs:30:9
+   |
+23 | pub(crate) struct NesHeader {
+   |                   --------- fields in this struct
+...
+30 |     pub prg_ram_size: u8,
+   |         ^^^^^^^^^^^^
+31 |     pub flags_9: u8,
+   |         ^^^^^^^
+32 |     pub flags_10: u8,
+   |         ^^^^^^^^
+33 |     pub reserved: [u8; 5],
+   |         ^^^^^^^^
+   |
+   = note: `NesHeader` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `mirroring` and `chr_rom` are never read
+  --> src/rom.rs:41:9
+   |
+39 | pub(crate) struct Rom {
+   |                   --- fields in this struct
+40 |     pub header: NesHeader,
+41 |     pub mirroring: Mirroring,
+   |         ^^^^^^^^^
+...
+44 |     pub chr_rom: Vec<u8>,
+   |         ^^^^^^^
+   |
+   = note: `Rom` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: method `handleADC` should have a snake case name
+ --> src/instructions/adc.rs:6:19
+  |
+6 |     pub(crate) fn handleADC(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_adc`
+  |
+  = note: `#[warn(non_snake_case)]` (part of `#[warn(nonstandard_style)]`) on by default
+
+warning: method `handleAND` should have a snake case name
+ --> src/instructions/and.rs:6:19
+  |
+6 |     pub(crate) fn handleAND(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_and`
+
+warning: method `handleASL` should have a snake case name
+ --> src/instructions/asl.rs:6:19
+  |
+6 |     pub(crate) fn handleASL(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_asl`
+
+warning: method `handleBCC` should have a snake case name
+ --> src/instructions/bcc.rs:6:19
+  |
+6 |     pub(crate) fn handleBCC(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_bcc`
+
+warning: method `handleBCS` should have a snake case name
+ --> src/instructions/bcs.rs:6:19
+  |
+6 |     pub(crate) fn handleBCS(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_bcs`
+
+warning: method `handleBEQ` should have a snake case name
+ --> src/instructions/beq.rs:6:19
+  |
+6 |     pub(crate) fn handleBEQ(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_beq`
+
+warning: method `handleBit` should have a snake case name
+ --> src/instructions/bit.rs:6:19
+  |
+6 |     pub(crate) fn handleBit(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_bit`
+
+warning: method `handleBMI` should have a snake case name
+ --> src/instructions/bmi.rs:6:19
+  |
+6 |     pub(crate) fn handleBMI(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_bmi`
+
+warning: method `handleBNE` should have a snake case name
+ --> src/instructions/bne.rs:6:19
+  |
+6 |     pub(crate) fn handleBNE(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_bne`
+
+warning: method `handleBPL` should have a snake case name
+ --> src/instructions/bpl.rs:6:19
+  |
+6 |     pub(crate) fn handleBPL(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_bpl`
+
+warning: method `handleBRK` should have a snake case name
+ --> src/instructions/brk.rs:6:19
+  |
+6 |     pub(crate) fn handleBRK(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_brk`
+
+warning: method `handleBVC` should have a snake case name
+ --> src/instructions/bvc.rs:6:19
+  |
+6 |     pub(crate) fn handleBVC(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_bvc`
+
+warning: method `handleBVS` should have a snake case name
+ --> src/instructions/bvs.rs:6:19
+  |
+6 |     pub(crate) fn handleBVS(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_bvs`
+
+warning: method `handleCLC` should have a snake case name
+ --> src/instructions/clc.rs:6:19
+  |
+6 |     pub(crate) fn handleCLC(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_clc`
+
+warning: method `handleCLD` should have a snake case name
+ --> src/instructions/cld.rs:6:19
+  |
+6 |     pub(crate) fn handleCLD(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_cld`
+
+warning: method `handleCLI` should have a snake case name
+ --> src/instructions/cli.rs:6:19
+  |
+6 |     pub(crate) fn handleCLI(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_cli`
+
+warning: method `handleCLV` should have a snake case name
+ --> src/instructions/clv.rs:6:19
+  |
+6 |     pub(crate) fn handleCLV(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_clv`
+
+warning: method `handleCMP` should have a snake case name
+ --> src/instructions/cmp.rs:6:19
+  |
+6 |     pub(crate) fn handleCMP(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_cmp`
+
+warning: method `handleCPX` should have a snake case name
+ --> src/instructions/cpx.rs:6:19
+  |
+6 |     pub(crate) fn handleCPX(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_cpx`
+
+warning: method `handleCPY` should have a snake case name
+ --> src/instructions/cpy.rs:7:19
+  |
+7 |     pub(crate) fn handleCPY(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_cpy`
+
+warning: method `handleDEC` should have a snake case name
+ --> src/instructions/dec.rs:6:19
+  |
+6 |     pub(crate) fn handleDEC(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_dec`
+
+warning: method `handleDEX` should have a snake case name
+ --> src/instructions/dex.rs:6:19
+  |
+6 |     pub(crate) fn handleDEX(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_dex`
+
+warning: method `handleDEY` should have a snake case name
+ --> src/instructions/dey.rs:6:19
+  |
+6 |     pub(crate) fn handleDEY(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_dey`
+
+warning: method `handleEOR` should have a snake case name
+ --> src/instructions/eor.rs:6:19
+  |
+6 |     pub(crate) fn handleEOR(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_eor`
+
+warning: method `handleINC` should have a snake case name
+ --> src/instructions/inc.rs:6:19
+  |
+6 |     pub(crate) fn handleINC(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_inc`
+
+warning: method `handleINX` should have a snake case name
+ --> src/instructions/inx.rs:6:19
+  |
+6 |     pub(crate) fn handleINX(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_inx`
+
+warning: method `handleINY` should have a snake case name
+ --> src/instructions/iny.rs:6:19
+  |
+6 |     pub(crate) fn handleINY(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_iny`
+
+warning: method `handleJMP` should have a snake case name
+ --> src/instructions/jmp.rs:6:19
+  |
+6 |     pub(crate) fn handleJMP(& mut self, _opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_jmp`
+
+warning: method `handleJSR` should have a snake case name
+ --> src/instructions/jsr.rs:6:19
+  |
+6 |     pub(crate) fn handleJSR(& mut self, _opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_jsr`
+
+warning: method `handleLDA` should have a snake case name
+ --> src/instructions/lda.rs:6:19
+  |
+6 |     pub(crate) fn handleLDA(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_lda`
+
+warning: method `handleLDX` should have a snake case name
+ --> src/instructions/ldx.rs:6:19
+  |
+6 |     pub(crate) fn handleLDX(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_ldx`
+
+warning: method `handleLDY` should have a snake case name
+ --> src/instructions/ldy.rs:6:19
+  |
+6 |     pub(crate) fn handleLDY(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_ldy`
+
+warning: method `handleLSR` should have a snake case name
+ --> src/instructions/lsr.rs:6:19
+  |
+6 |     pub(crate) fn handleLSR(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_lsr`
+
+warning: method `handleNOP` should have a snake case name
+ --> src/instructions/nop.rs:6:19
+  |
+6 |     pub(crate) fn handleNOP(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_nop`
+
+warning: method `handleORA` should have a snake case name
+ --> src/instructions/ora.rs:6:19
+  |
+6 |     pub(crate) fn handleORA(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_ora`
+
+warning: method `handlePHA` should have a snake case name
+ --> src/instructions/pha.rs:6:19
+  |
+6 |     pub(crate) fn handlePHA(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_pha`
+
+warning: method `handlePHP` should have a snake case name
+ --> src/instructions/php.rs:6:19
+  |
+6 |     pub(crate) fn handlePHP(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_php`
+
+warning: method `handlePLA` should have a snake case name
+ --> src/instructions/pla.rs:6:19
+  |
+6 |     pub(crate) fn handlePLA(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_pla`
+
+warning: method `handlePLP` should have a snake case name
+ --> src/instructions/plp.rs:6:19
+  |
+6 |     pub(crate) fn handlePLP(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_plp`
+
+warning: method `handleROL` should have a snake case name
+ --> src/instructions/rol.rs:6:19
+  |
+6 |     pub(crate) fn handleROL(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_rol`
+
+warning: method `handleROR` should have a snake case name
+ --> src/instructions/ror.rs:6:19
+  |
+6 |     pub(crate) fn handleROR(& mut self, opt_value: Option<u8>, opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_ror`
+
+warning: method `handleRTI` should have a snake case name
+ --> src/instructions/rti.rs:6:19
+  |
+6 |     pub(crate) fn handleRTI(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_rti`
+
+warning: method `handleRTS` should have a snake case name
+ --> src/instructions/rts.rs:6:19
+  |
+6 |     pub(crate) fn handleRTS(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_rts`
+
+warning: method `handleSBC` should have a snake case name
+ --> src/instructions/sbc.rs:6:19
+  |
+6 |     pub(crate) fn handleSBC(& mut self, opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_sbc`
+
+warning: method `handleSEC` should have a snake case name
+ --> src/instructions/sec.rs:6:19
+  |
+6 |     pub(crate) fn handleSEC(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_sec`
+
+warning: method `handleSED` should have a snake case name
+ --> src/instructions/sed.rs:6:19
+  |
+6 |     pub(crate) fn handleSED(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_sed`
+
+warning: method `handleSEI` should have a snake case name
+ --> src/instructions/sei.rs:6:19
+  |
+6 |     pub(crate) fn handleSEI(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_sei`
+
+warning: method `handleSTA` should have a snake case name
+ --> src/instructions/sta.rs:6:19
+  |
+6 |     pub(crate) fn handleSTA(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_sta`
+
+warning: method `handleSTX` should have a snake case name
+ --> src/instructions/stx.rs:6:19
+  |
+6 |     pub(crate) fn handleSTX(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_stx`
+
+warning: method `handleSTY` should have a snake case name
+ --> src/instructions/sty.rs:6:19
+  |
+6 |     pub(crate) fn handleSTY(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_sty`
+
+warning: method `handleTAX` should have a snake case name
+ --> src/instructions/tax.rs:6:19
+  |
+6 |     pub(crate) fn handleTAX(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_tax`
+
+warning: method `handleTAY` should have a snake case name
+ --> src/instructions/tay.rs:6:19
+  |
+6 |     pub(crate) fn handleTAY(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_tay`
+
+warning: method `handleTSX` should have a snake case name
+ --> src/instructions/tsx.rs:6:19
+  |
+6 |     pub(crate) fn handleTSX(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_tsx`
+
+warning: method `handleTXA` should have a snake case name
+ --> src/instructions/txa.rs:6:19
+  |
+6 |     pub(crate) fn handleTXA(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_txa`
+
+warning: method `handleTXS` should have a snake case name
+ --> src/instructions/txs.rs:6:19
+  |
+6 |     pub(crate) fn handleTXS(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_txs`
+
+warning: method `handleTYA` should have a snake case name
+ --> src/instructions/tya.rs:6:19
+  |
+6 |     pub(crate) fn handleTYA(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
+  |                   ^^^^^^^^^ help: convert the identifier to snake case: `handle_tya`
+
+warning: `Nes` (bin "Nes" test) generated 58 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.40s
+     Running unittests src/main.rs (target/debug/deps/Nes-aa1cb947a3b2be81)
+
+running 1 test
+test instructions::brk::tests::test_brk_instruction ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 138 filtered out; finished in 0.00s
+
