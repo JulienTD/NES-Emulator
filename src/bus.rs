@@ -18,7 +18,7 @@ pub(crate) struct Bus {
 }
 
 impl Bus {
-    pub fn new(rom: Rom) -> Self {
+    pub(crate) fn new(rom: Rom) -> Self {
         Self {
             internal_ram: [0; 0x0800],
             rom

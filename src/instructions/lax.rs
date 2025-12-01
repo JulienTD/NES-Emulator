@@ -1,6 +1,4 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
     // LAX loads accumulator and X with the memory operand and sets N/Z
@@ -17,8 +15,9 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
     #[test]
     fn test_lax_loads_accumulator_and_x() {
