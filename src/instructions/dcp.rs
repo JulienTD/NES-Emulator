@@ -20,7 +20,6 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::bus::Bus;
     use crate::cpu6502::new_cpu;
     use crate::cpu6502::StatusFlag;

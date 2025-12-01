@@ -1,6 +1,4 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
     // XAA / ANE – unofficial: A = (A & X) & imm
@@ -17,8 +15,9 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu};
+    use crate::rom::Rom;
 
     #[test]
     fn test_xaa_combines_a_x_and_operand() {

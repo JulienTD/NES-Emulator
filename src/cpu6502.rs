@@ -85,7 +85,7 @@ pub(crate) enum AddressingMode {
     ZeroPageY,   // e.g. LDX $10,Y
 }
 
-pub fn new_cpu(bus: Bus) -> CPU {
+pub(crate) fn new_cpu(bus: Bus) -> CPU {
     CPU {
         program_counter: 0x0000,
         stack_pointer: CPU::STACK_ADDRESS_DEFAULT_COLD_START,
@@ -793,7 +793,7 @@ impl CPU {
     }
 }
 
-pub fn trace(cpu: &mut CPU) -> String {
+pub(crate) fn trace(cpu: &mut CPU) -> String {
     let pc = cpu.program_counter;
     let code = cpu.read_u8(pc);
     let ops = OPERAND_MAP.get(&code).expect(&format!("Opcode {:x} is not supported", code));

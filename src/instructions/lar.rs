@@ -1,6 +1,4 @@
 use crate::cpu6502::{CPU, StatusFlag};
-use crate::bus::Bus;
-use crate::rom::Rom;
 
 impl CPU {
 	// LAR — AND memory with stack pointer, transfer result to A, X and SP
@@ -23,8 +21,9 @@ impl CPU {
 
 #[cfg(test)]
 mod tests {
-	use super::*;
-	use crate::cpu6502::new_cpu;
+    use crate::bus::Bus;
+    use crate::cpu6502::{new_cpu, StatusFlag};
+    use crate::rom::Rom;
 
 	#[test]
 	fn test_lar_loads_a_x_and_sp_and_sets_flags() {

@@ -1,7 +1,7 @@
-mod cpu6502;
-mod instructions;
-mod rom;
-mod bus;
+pub mod cpu6502;
+pub mod instructions;
+pub mod rom;
+pub mod bus;
 
 use crate::cpu6502::trace;
 use crate::cpu6502::{CPU};
