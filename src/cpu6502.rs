@@ -398,7 +398,7 @@ static OPERAND_MAP: phf::Map<u8, Operand> = phf_map! {
     0xABu8 => Operand { opcode: 0xAB, name: "ATX", handler: CPU::handle_atx, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
 
     // AXA/SHA
-    0x9Fu8 => Operand { opcode: 0x9F, name: "AXA", handler: CPU::handle_axa, addressing_mode: AddressingMode::Immediate, bytes: 3, cycles: 5 },
+    0x9Fu8 => Operand { opcode: 0x9F, name: "AXA", handler: CPU::handle_axa, addressing_mode: AddressingMode::AbsoluteY, bytes: 3, cycles: 5 },
     0x93u8 => Operand { opcode: 0x93, name: "AXA", handler: CPU::handle_axa, addressing_mode: AddressingMode::IndirectY, bytes: 2, cycles: 6 },
 
     // AXS/SBX/SAX
@@ -612,18 +612,11 @@ impl CPU {
     }
 
     pub(crate) fn load_program(& mut self, program: &[u8]) {
-        // let start_address = CPU::PRG_ROM_BASE_ADDRESS as usize;
-        // let end_address = start_address + program.len();
-
-        // if end_address > self.memory.len() {
-        //     panic!("Program size exceeds memory bounds");
-        // }
-
         for i in 0..(program.len() as u16) {
             self.write_u8(0x0000 + i, program[i as usize]);
         }
-        self.write_u16(0xFFFC, 0x0000); // Set reset vector to start of program
-        self.program_counter = self.read_u16(CPU::RESET_VECTOR_ADDRESS);
+        // Set PC directly to the start of the loaded program.
+        self.program_counter = 0x0000;
     }
 
     pub(crate) fn reset(&mut self) {
@@ -634,7 +627,7 @@ impl CPU {
 
         // 0xFFFC corresponds to the reset vector address.
         self.program_counter = self.read_u16(CPU::RESET_VECTOR_ADDRESS);
-        self.cycles = 8; // Reset takes 8 cycles
+        self.cycles = 7; // Reset takes 7 cycles
         self.halted = false;
     }
 
@@ -670,7 +663,7 @@ impl CPU {
                         let (addr, page_crossed) = self.get_operand_address(operand_info.addressing_mode, pc_before_instruction + 1);
                         if page_crossed {
                             match operand_info.name {
-                                "ADC" | "AND" | "CMP" | "EOR" | "LDA" | "LDX" | "LDY" | "ORA" | "SBC" => {
+                                "ADC" | "AND" | "CMP" | "EOR" | "LDA" | "LAX" | "LAR" | "LDX" | "LDY" | "NOP" | "ORA" | "SBC" | "TOP" => {
                                     self.cycles += 1;
                                 }
                                 // "STA", "STX", "STY" and others do not take the penalty

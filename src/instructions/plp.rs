@@ -4,15 +4,12 @@ impl CPU {
     pub(crate) fn handle_plp(& mut self, _opt_value: Option<u8>, _opt_address: Option<u16>) -> u8 {
         let popped_status = self.pop_u8();
 
-        // The B and U flags are not affected by PLP.
-        // We need to preserve their current state from the status register.
+        // B (bit 4) is not a real hardware flag; force it clear.
+        // U (bit 5) is hardwired high; force it set.
         let b_flag_mask = 1 << (StatusFlag::BreakCommand as u8);
         let u_flag_mask = 1 << (StatusFlag::Unused as u8);
-        let preserved_mask = b_flag_mask | u_flag_mask;
 
-        // Set the status register to the popped value, but ignore the B and U flags from the stack.
-        // Then, merge in the preserved B and U flags from the current status register.
-        self.status_register = (popped_status & !preserved_mask) | (self.status_register & preserved_mask);
+        self.status_register = (popped_status & !b_flag_mask) | u_flag_mask;
 
         return 0;
     }

@@ -48,6 +48,9 @@ pub(crate) struct Rom {
 
 impl Rom {
     pub(crate) fn parse_nes_rom(rom_data: Vec<u8>) -> Result<Rom, String> {
+        if rom_data.len() < HEADER_SIZE {
+            return Err(format!("ROM too short: {} bytes (minimum {})", rom_data.len(), HEADER_SIZE));
+        }
         if &rom_data[0..4] != MAGIC_NUMBERS {
             return Err("File is not in iNES format".to_string());
         }
@@ -104,13 +107,23 @@ impl Rom {
         // Calculate the size of CHR ROM (8KB units)
         let chr_rom_len = header.chr_rom_size as usize * 8192;
 
-        return Ok(Rom {
+        let prg_rom_end = prg_rom_start + prg_rom_len;
+        let chr_rom_end = chr_rom_start + chr_rom_len;
+
+        if prg_rom_end > rom_data.len() {
+            return Err(format!("ROM truncated: PRG ROM ends at {} but file is {} bytes", prg_rom_end, rom_data.len()));
+        }
+        if chr_rom_len > 0 && chr_rom_end > rom_data.len() {
+            return Err(format!("ROM truncated: CHR ROM ends at {} but file is {} bytes", chr_rom_end, rom_data.len()));
+        }
+
+        Ok(Rom {
             header,
-            prg_rom: rom_data[prg_rom_start..(prg_rom_start + prg_rom_len)].to_vec(),
-            chr_rom: rom_data[chr_rom_start..(chr_rom_start + chr_rom_len)].to_vec(),
+            prg_rom: rom_data[prg_rom_start..prg_rom_end].to_vec(),
+            chr_rom: rom_data[chr_rom_start..chr_rom_end].to_vec(),
             mirroring,
             mapper,
-        });
+        })
     }
 
     // Returns the MapperType based on the mapper ID byte.
