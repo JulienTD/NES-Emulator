@@ -35,4 +35,42 @@ mod tests {
         assert_eq!(cpu.x_register, 0x0B);
         assert!(cpu.get_status_flag(StatusFlag::Carry));
     }
+
+    #[test]
+    fn test_axs_zero_flag_when_result_is_zero() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        // temp = A & X = 0x10 & 0x10 = 0x10, subtract 0x10 -> 0
+        cpu.accumulator = 0x10;
+        cpu.x_register = 0x10;
+        let _ = cpu.handle_axs(Some(0x10), None);
+        assert_eq!(cpu.x_register, 0x00);
+        assert!(cpu.get_status_flag(StatusFlag::Zero));
+        assert!(cpu.get_status_flag(StatusFlag::Carry)); // no borrow
+    }
+
+    #[test]
+    fn test_axs_negative_flag_when_result_has_high_bit() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        // temp = 0xFF & 0xFF = 0xFF, subtract 0x01 -> 0xFE (negative)
+        cpu.accumulator = 0xFF;
+        cpu.x_register = 0xFF;
+        let _ = cpu.handle_axs(Some(0x01), None);
+        assert_eq!(cpu.x_register, 0xFE);
+        assert!(cpu.get_status_flag(StatusFlag::Negative));
+        assert!(!cpu.get_status_flag(StatusFlag::Zero));
+        assert!(cpu.get_status_flag(StatusFlag::Carry)); // 0xFF >= 0x01
+    }
+
+    #[test]
+    fn test_axs_carry_cleared_on_borrow() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        // temp = 0x01 & 0xFF = 0x01, subtract 0x10 -> borrow, carry cleared
+        cpu.accumulator = 0x01;
+        cpu.x_register = 0xFF;
+        let _ = cpu.handle_axs(Some(0x10), None);
+        // 0x01 - 0x10 wraps to 0xF1
+        assert_eq!(cpu.x_register, 0xF1);
+        assert!(!cpu.get_status_flag(StatusFlag::Carry));
+        assert!(cpu.get_status_flag(StatusFlag::Negative));
+    }
 }

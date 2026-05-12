@@ -383,10 +383,10 @@ static OPERAND_MAP: phf::Map<u8, Operand> = phf_map! {
     0x2B => Operand { opcode: 0x2B, name: "AAC", handler: CPU::handle_aac, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2  },
 
     // AAX/SAX/AXS Instructions
-    0x87u8 => Operand { opcode: 0x87, name: "AAX", handler: CPU::handle_aax, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
-    0x97u8 => Operand { opcode: 0x97, name: "AAX", handler: CPU::handle_aax, addressing_mode: AddressingMode::ZeroPageY, bytes: 2, cycles: 4 },
-    0x83u8 => Operand { opcode: 0x83, name: "AAX", handler: CPU::handle_aax, addressing_mode: AddressingMode::IndirectX, bytes: 2, cycles: 6 },
-    0x8Fu8 => Operand { opcode: 0x8F, name: "AAX", handler: CPU::handle_aax, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 4 },
+    0x87u8 => Operand { opcode: 0x87, name: "SAX", handler: CPU::handle_aax, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
+    0x97u8 => Operand { opcode: 0x97, name: "SAX", handler: CPU::handle_aax, addressing_mode: AddressingMode::ZeroPageY, bytes: 2, cycles: 4 },
+    0x83u8 => Operand { opcode: 0x83, name: "SAX", handler: CPU::handle_aax, addressing_mode: AddressingMode::IndirectX, bytes: 2, cycles: 6 },
+    0x8Fu8 => Operand { opcode: 0x8F, name: "SAX", handler: CPU::handle_aax, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 4 },
 
     // AAR
     0x6Bu8 => Operand { opcode: 0x6B, name: "ARR", handler: CPU::handle_arr, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
@@ -414,29 +414,29 @@ static OPERAND_MAP: phf::Map<u8, Operand> = phf_map! {
     0xD3u8 => Operand { opcode: 0xD3, name: "DCP", handler: CPU::handle_dcp, addressing_mode: AddressingMode::IndirectY, bytes: 2, cycles: 8 },
 
     // DOP/NOP/SKB
-    0x04u8 => Operand { opcode: 0x04, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
-    0x14u8 => Operand { opcode: 0x14, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
-    0x34u8 => Operand { opcode: 0x34, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
-    0x44u8 => Operand { opcode: 0x44, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
-    0x54u8 => Operand { opcode: 0x54, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
-    0x64u8 => Operand { opcode: 0x64, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
-    0x74u8 => Operand { opcode: 0x74, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
-    0x80u8 => Operand { opcode: 0x80, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
-    0x82u8 => Operand { opcode: 0x82, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
-    0x89u8 => Operand { opcode: 0x89, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
-    0xC2u8 => Operand { opcode: 0xC2, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
-    0xD4u8 => Operand { opcode: 0xD4, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
-    0xE2u8 => Operand { opcode: 0xE2, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
-    0xF4u8 => Operand { opcode: 0xF4, name: "DOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
+    0x04u8 => Operand { opcode: 0x04, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
+    0x14u8 => Operand { opcode: 0x14, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
+    0x34u8 => Operand { opcode: 0x34, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
+    0x44u8 => Operand { opcode: 0x44, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
+    0x54u8 => Operand { opcode: 0x54, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
+    0x64u8 => Operand { opcode: 0x64, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 3 },
+    0x74u8 => Operand { opcode: 0x74, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
+    0x80u8 => Operand { opcode: 0x80, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
+    0x82u8 => Operand { opcode: 0x82, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
+    0x89u8 => Operand { opcode: 0x89, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
+    0xC2u8 => Operand { opcode: 0xC2, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
+    0xD4u8 => Operand { opcode: 0xD4, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
+    0xE2u8 => Operand { opcode: 0xE2, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
+    0xF4u8 => Operand { opcode: 0xF4, name: "NOP", handler: CPU::handle_dop, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 4 },
 
     // ISC/ISB/INS
-    0xE7u8 => Operand { opcode: 0xE7, name: "ISC", handler: CPU::handle_isc, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 5 },
-    0xF7u8 => Operand { opcode: 0xF7, name: "ISC", handler: CPU::handle_isc, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 6 },
-    0xEFu8 => Operand { opcode: 0xEF, name: "ISC", handler: CPU::handle_isc, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 6 },
-    0xFFu8 => Operand { opcode: 0xFF, name: "ISC", handler: CPU::handle_isc, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 7 },
-    0xFBu8 => Operand { opcode: 0xFB, name: "ISC", handler: CPU::handle_isc, addressing_mode: AddressingMode::AbsoluteY, bytes: 3, cycles: 7 },
-    0xE3u8 => Operand { opcode: 0xE3, name: "ISC", handler: CPU::handle_isc, addressing_mode: AddressingMode::IndirectX, bytes: 2, cycles: 8 },
-    0xF3u8 => Operand { opcode: 0xF3, name: "ISC", handler: CPU::handle_isc, addressing_mode: AddressingMode::IndirectY, bytes: 2, cycles: 8 },
+    0xE7u8 => Operand { opcode: 0xE7, name: "ISB", handler: CPU::handle_isc, addressing_mode: AddressingMode::ZeroPage, bytes: 2, cycles: 5 },
+    0xF7u8 => Operand { opcode: 0xF7, name: "ISB", handler: CPU::handle_isc, addressing_mode: AddressingMode::ZeroPageX, bytes: 2, cycles: 6 },
+    0xEFu8 => Operand { opcode: 0xEF, name: "ISB", handler: CPU::handle_isc, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 6 },
+    0xFFu8 => Operand { opcode: 0xFF, name: "ISB", handler: CPU::handle_isc, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 7 },
+    0xFBu8 => Operand { opcode: 0xFB, name: "ISB", handler: CPU::handle_isc, addressing_mode: AddressingMode::AbsoluteY, bytes: 3, cycles: 7 },
+    0xE3u8 => Operand { opcode: 0xE3, name: "ISB", handler: CPU::handle_isc, addressing_mode: AddressingMode::IndirectX, bytes: 2, cycles: 8 },
+    0xF3u8 => Operand { opcode: 0xF3, name: "ISB", handler: CPU::handle_isc, addressing_mode: AddressingMode::IndirectY, bytes: 2, cycles: 8 },
 
     // KIL/JAM/HLT
     0x02u8 => Operand { opcode: 0x02, name: "KIL", handler: CPU::handle_kil, addressing_mode: AddressingMode::Implicit, bytes: 1, cycles: 0 },
@@ -517,13 +517,13 @@ static OPERAND_MAP: phf::Map<u8, Operand> = phf_map! {
     0x9cu8 => Operand { opcode: 0x9C, name: "SYA", handler: CPU::handle_sya, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 5 },
 
     // TOP/SKW
-    0x0Cu8 => Operand { opcode: 0x0C, name: "TOP", handler: CPU::handle_top, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 4 },
-    0x1Cu8 => Operand { opcode: 0x1C, name: "TOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
-    0x3Cu8 => Operand { opcode: 0x3C, name: "TOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
-    0x5Cu8 => Operand { opcode: 0x5C, name: "TOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
-    0x7Cu8 => Operand { opcode: 0x7C, name: "TOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
-    0xDCu8 => Operand { opcode: 0xDC, name: "TOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
-    0xFCu8 => Operand { opcode: 0xFC, name: "TOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
+    0x0Cu8 => Operand { opcode: 0x0C, name: "NOP", handler: CPU::handle_top, addressing_mode: AddressingMode::Absolute, bytes: 3, cycles: 4 },
+    0x1Cu8 => Operand { opcode: 0x1C, name: "NOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
+    0x3Cu8 => Operand { opcode: 0x3C, name: "NOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
+    0x5Cu8 => Operand { opcode: 0x5C, name: "NOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
+    0x7Cu8 => Operand { opcode: 0x7C, name: "NOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
+    0xDCu8 => Operand { opcode: 0xDC, name: "NOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
+    0xFCu8 => Operand { opcode: 0xFC, name: "NOP", handler: CPU::handle_top, addressing_mode: AddressingMode::AbsoluteX, bytes: 3, cycles: 4 /* +1 if page crossed */ },
 
     // XAA/ANE
     0x8Bu8 => Operand { opcode: 0x8B, name: "XAA", handler: CPU::handle_xaa, addressing_mode: AddressingMode::Immediate, bytes: 2, cycles: 2 },
@@ -546,7 +546,7 @@ impl CPU {
     const STACK_ADDRESS_DEFAULT_WARM_START: u8 = 0xFD;
     const RESET_VECTOR_ADDRESS: u16 = 0xFFFC;
 
-    pub(crate) fn read_u8(&self, addr: u16) -> u8 {
+    pub(crate) fn read_u8(&mut self, addr: u16) -> u8 {
         self.bus.read_u8(addr)
     }
 
@@ -554,7 +554,7 @@ impl CPU {
         self.bus.write_u8(addr, value);
     }
 
-    pub(crate) fn read_u16(&self, addr: u16) -> u16 {
+    pub(crate) fn read_u16(&mut self, addr: u16) -> u16 {
         // We use little-endian format: low byte at addr, high byte at addr + 1
         return u16::from_le_bytes([self.read_u8(addr), self.read_u8(addr + 1)]);
     }
@@ -663,7 +663,7 @@ impl CPU {
                         let (addr, page_crossed) = self.get_operand_address(operand_info.addressing_mode, pc_before_instruction + 1);
                         if page_crossed {
                             match operand_info.name {
-                                "ADC" | "AND" | "CMP" | "EOR" | "LDA" | "LAX" | "LAR" | "LDX" | "LDY" | "NOP" | "ORA" | "SBC" | "TOP" => {
+                                "ADC" | "AND" | "CMP" | "EOR" | "LDA" | "LAX" | "LAR" | "LDX" | "LDY" | "NOP" | "ORA" | "SBC" => {
                                     self.cycles += 1;
                                 }
                                 // "STA", "STX", "STY" and others do not take the penalty
@@ -684,6 +684,9 @@ impl CPU {
                 if self.program_counter == pc_before_instruction {
                     self.program_counter = self.program_counter.wrapping_add(operand_info.bytes as u16);
                 }
+
+                self.bus.tick(operand_info.cycles + handler_extra);
+
             } else {
                 panic!("Unimplemented opcode: {:02X}", opcode);
             }
@@ -715,7 +718,7 @@ impl CPU {
     }
 
     // Helper to get effective address based on addressing mode
-    pub(crate) fn get_operand_address(&self, mode: AddressingMode, addr: u16) -> (u16, bool) {
+    pub(crate) fn get_operand_address(&mut self, mode: AddressingMode, addr: u16) -> (u16, bool) {
         match mode {
             AddressingMode::Absolute => (self.read_u16(addr), false),
 
@@ -784,6 +787,37 @@ impl CPU {
             }
         }
     }
+}
+
+fn is_unofficial(opcode: u8) -> bool {
+    matches!(opcode,
+        0x0B | 0x2B |                                           // AAC
+        0x87 | 0x97 | 0x83 | 0x8F |                            // SAX
+        0x6B |                                                  // ARR
+        0x4B |                                                  // ASR
+        0xAB |                                                  // ATX
+        0x9F | 0x93 |                                           // AXA
+        0xCB |                                                  // AXS
+        0xC7 | 0xD7 | 0xCF | 0xDF | 0xDB | 0xC3 | 0xD3 |      // DCP
+        0x04 | 0x14 | 0x34 | 0x44 | 0x54 | 0x64 | 0x74 |
+        0x80 | 0x82 | 0x89 | 0xC2 | 0xD4 | 0xE2 | 0xF4 |      // NOP (unofficial 2-byte)
+        0xE7 | 0xF7 | 0xEF | 0xFF | 0xFB | 0xE3 | 0xF3 |      // ISB
+        0x02 | 0x12 | 0x22 | 0x32 | 0x42 | 0x52 |
+        0x62 | 0x72 | 0x92 | 0xB2 | 0xD2 | 0xF2 |             // KIL
+        0xBB |                                                  // LAR
+        0xA7 | 0xB7 | 0xAF | 0xBF | 0xA3 | 0xB3 |             // LAX
+        0x1A | 0x3A | 0x5A | 0x7A | 0xDA | 0xFA |             // NOP (unofficial 1-byte)
+        0x27 | 0x37 | 0x2F | 0x3F | 0x3B | 0x23 | 0x33 |      // RLA
+        0x67 | 0x77 | 0x6F | 0x7F | 0x7B | 0x63 | 0x73 |      // RRA
+        0xEB |                                                  // SBC (unofficial)
+        0x07 | 0x17 | 0x0F | 0x1F | 0x1B | 0x03 | 0x13 |      // SLO
+        0x47 | 0x57 | 0x4F | 0x5F | 0x5B | 0x43 | 0x53 |      // SRE
+        0x9E |                                                  // SXA
+        0x9C |                                                  // SYA
+        0x0C | 0x1C | 0x3C | 0x5C | 0x7C | 0xDC | 0xFC |      // NOP (unofficial 3-byte)
+        0x8B |                                                  // XAA
+        0x9B                                                    // XAS
+    )
 }
 
 pub(crate) fn trace(cpu: &mut CPU) -> String {
@@ -872,7 +906,12 @@ pub(crate) fn trace(cpu: &mut CPU) -> String {
     // 15:    Space
     // 16-47: Assembly
     // 48...: Registers
-    let asm_str = format!("{:04X}  {:<8} {: >4} {}", pc, hex_str, ops.name, tmp_ops)
+    let name = if is_unofficial(code) {
+        format!("*{}", ops.name)
+    } else {
+        ops.name.to_string()
+    };
+    let asm_str = format!("{:04X}  {:<8} {: >4} {}", pc, hex_str, name, tmp_ops)
         .trim()
         .to_string();
 
@@ -885,8 +924,41 @@ pub(crate) fn trace(cpu: &mut CPU) -> String {
 #[cfg(test)]
 mod tests {
     use crate::bus::Bus;
-    use crate::cpu6502::{AddressingMode, new_cpu, StatusFlag};
+    use crate::cpu6502::{AddressingMode, new_cpu, StatusFlag, trace};
     use crate::rom::Rom;
+
+    fn strip_ppu(line: &str) -> String {
+        match (line.find(" PPU:"), line.find(" CYC:")) {
+            (Some(ppu), Some(cyc)) => format!("{}{}", &line[..ppu], &line[cyc..]),
+            _ => line.to_string(),
+        }
+    }
+
+    #[test]
+    fn test_nestest() {
+        let rom_data = std::fs::read("nestest.nes")
+            .expect("nestest.nes not found — run tests from project root");
+        let rom = Rom::parse_nes_rom(rom_data).expect("Failed to parse nestest ROM");
+        let bus = Bus::new(rom);
+        let mut cpu = new_cpu(bus);
+        cpu.reset();
+        cpu.program_counter = 0xC000;
+
+        let mut actual: Vec<String> = Vec::new();
+        cpu.run_with_callback(|cpu| actual.push(trace(cpu)));
+
+        let reference = std::fs::read_to_string("nestest.log")
+            .expect("nestest.log not found — run tests from project root");
+
+        for (i, (got, expected)) in actual.iter().zip(reference.lines()).enumerate() {
+            assert_eq!(
+                strip_ppu(got),
+                strip_ppu(expected),
+                "nestest mismatch on line {} (instruction #{i}+1)\n  got:      {got}\n  expected: {expected}",
+                i + 1,
+            );
+        }
+    }
 
     #[test]
     fn test_cpu_init() {

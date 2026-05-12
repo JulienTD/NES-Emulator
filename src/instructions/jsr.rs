@@ -33,4 +33,36 @@ mod tests {
         // The address of the last byte of the instruction (0x8000 + 2 = 0x8002) should be pushed.
         assert_eq!(cpu.read_u16(0x01FE), 0x8002, "Return address (minus one) should be pushed to the stack");
     }
+
+    #[test]
+    fn test_jsr_return_address_is_pc_plus_two() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.program_counter = 0x0300;
+        cpu.handle_jsr(None, Some(0x0500));
+        // Return address pushed = 0x0300 + 2 = 0x0302
+        assert_eq!(cpu.read_u16(0x01FE), 0x0302);
+    }
+
+    #[test]
+    fn test_jsr_stack_pointer_decremented_by_two() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let initial_sp = cpu.stack_pointer;
+        cpu.handle_jsr(None, Some(0x1000));
+        assert_eq!(cpu.stack_pointer, initial_sp.wrapping_sub(2));
+    }
+
+    #[test]
+    fn test_jsr_does_not_affect_status_register() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let initial_status = cpu.status_register;
+        cpu.handle_jsr(None, Some(0x1000));
+        assert_eq!(cpu.status_register, initial_status);
+    }
+
+    #[test]
+    fn test_jsr_returns_zero_extra_cycles() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let extra = cpu.handle_jsr(None, Some(0x1234));
+        assert_eq!(extra, 0);
+    }
 }

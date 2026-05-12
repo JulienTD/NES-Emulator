@@ -44,7 +44,8 @@ mod tests {
         cpu.accumulator = 0x10;
         cpu.set_status_flag(StatusFlag::Carry, true);
 
-        let _ = cpu.handle_isc(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_isc(Some(value), Some(addr));
 
         // memory incremented to 2
         assert_eq!(cpu.read_u8(addr), 0x02);
@@ -60,7 +61,8 @@ mod tests {
         cpu.accumulator = 0x05;
         cpu.set_status_flag(StatusFlag::Carry, true);
 
-        let _ = cpu.handle_isc(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_isc(Some(value), Some(addr));
 
         // memory incremented to 6
         assert_eq!(cpu.read_u8(addr), 0x06);
@@ -78,7 +80,8 @@ mod tests {
         cpu.accumulator = 0x07;
         cpu.set_status_flag(StatusFlag::Carry, false); // will subtract extra 1
 
-        let _ = cpu.handle_isc(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_isc(Some(value), Some(addr));
 
         // memory incremented to 6
         assert_eq!(cpu.read_u8(addr), 0x06);
@@ -97,7 +100,8 @@ mod tests {
         cpu.accumulator = 0x80; // -128 signed
         cpu.set_status_flag(StatusFlag::Carry, true);
 
-        let _ = cpu.handle_isc(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_isc(Some(value), Some(addr));
 
         // result = 0x80 - 0x01 = 0x7F (127) -> positive while A was negative => overflow
         assert_eq!(cpu.accumulator, 0x7F);

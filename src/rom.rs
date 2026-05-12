@@ -43,7 +43,7 @@ pub(crate) struct Rom {
     pub mirroring: Mirroring,
     pub mapper: u8,
     pub prg_rom: Vec<u8>,
-    pub chr_rom: Vec<u8>,
+    pub chr_rom: Option<Vec<u8>>,
 }
 
 impl Rom {
@@ -120,7 +120,7 @@ impl Rom {
         Ok(Rom {
             header,
             prg_rom: rom_data[prg_rom_start..prg_rom_end].to_vec(),
-            chr_rom: rom_data[chr_rom_start..chr_rom_end].to_vec(),
+            chr_rom: Some(rom_data[chr_rom_start..chr_rom_end].to_vec()),
             mirroring,
             mapper,
         })
@@ -190,7 +190,127 @@ impl Rom {
             mirroring: Mirroring::Horizontal, // Common default
             mapper: 0, // Mapper 0 (NROM)
             prg_rom: prg_data,
-            chr_rom: chr_data,
+            chr_rom: Some(chr_data),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Helper: build a minimal valid iNES byte-vector.
+    // prg_units: number of 16KB PRG chunks
+    // chr_units: number of 8KB CHR chunks
+    // flags_6 / flags_7: header flag bytes
+    fn build_ines(prg_units: u8, chr_units: u8, flags_6: u8, flags_7: u8) -> Vec<u8> {
+        let mut data = Vec::new();
+        data.extend_from_slice(b"NES\x1a");
+        data.push(prg_units);
+        data.push(chr_units);
+        data.push(flags_6);
+        data.push(flags_7);
+        data.extend_from_slice(&[0u8; 8]); // remaining header bytes
+
+        let prg_len = prg_units as usize * 16384;
+        data.extend(std::iter::repeat(0u8).take(prg_len));
+
+        let chr_len = chr_units as usize * 8192;
+        data.extend(std::iter::repeat(0u8).take(chr_len));
+
+        data
+    }
+
+    // -----------------------------------------------------------------------
+    // 1. parse_nes_rom returns Err for a file shorter than 16 bytes
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_parse_too_short() {
+        let short = vec![0u8; 10];
+        assert!(Rom::parse_nes_rom(short).is_err());
+    }
+
+    // -----------------------------------------------------------------------
+    // 2. parse_nes_rom returns Err for wrong magic numbers
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_parse_wrong_magic() {
+        let mut data = build_ines(1, 1, 0, 0);
+        // Corrupt the magic bytes
+        data[0] = 0x00;
+        data[1] = 0x00;
+        assert!(Rom::parse_nes_rom(data).is_err());
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. parse_nes_rom returns Err if the file is truncated
+    //    (header says 32KB PRG but file is shorter)
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_parse_truncated_prg() {
+        // Start with a valid header claiming 32KB PRG
+        let mut data: Vec<u8> = Vec::new();
+        data.extend_from_slice(b"NES\x1a");
+        data.push(2); // 2 × 16KB = 32KB PRG
+        data.push(0); // no CHR
+        data.extend_from_slice(&[0u8; 10]); // rest of header
+        // Append only 100 bytes of PRG data instead of 32768
+        data.extend(std::iter::repeat(0u8).take(100));
+
+        assert!(Rom::parse_nes_rom(data).is_err());
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. parse_nes_rom correctly parses a valid 16KB ROM
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_parse_valid_16kb_rom() {
+        let data = build_ines(1, 1, 0, 0);
+        let rom = Rom::parse_nes_rom(data).expect("should parse a valid 16KB ROM");
+        assert_eq!(rom.prg_rom.len(), 16384);
+    }
+
+    // -----------------------------------------------------------------------
+    // 5. parse_nes_rom correctly parses a valid 32KB ROM
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_parse_valid_32kb_rom() {
+        let data = build_ines(2, 1, 0, 0);
+        let rom = Rom::parse_nes_rom(data).expect("should parse a valid 32KB ROM");
+        assert_eq!(rom.prg_rom.len(), 32768);
+    }
+
+    // -----------------------------------------------------------------------
+    // 6. check_validity returns Err for an unsupported mapper
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_check_validity_unsupported_mapper() {
+        // Mapper 255 (Unknown) → flags_7 upper nibble = 0xF0, flags_6 upper nibble = 0xF0
+        // mapper = (flags_7 & 0xF0) | (flags_6 >> 4) → 0xF0 | 0x0F = 0xFF = 255
+        let data = build_ines(1, 1, 0xF0, 0xF0);
+        let rom = Rom::parse_nes_rom(data).expect("should parse header");
+        assert!(rom.check_validity().is_err(), "unknown mapper should be invalid");
+    }
+
+    // -----------------------------------------------------------------------
+    // 7. check_validity returns Err for invalid NROM PRG size (e.g. 3 units)
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_check_validity_invalid_nrom_prg_size() {
+        // Mapper 0, but prg_rom_size = 3 (neither 1 nor 2)
+        let data = build_ines(3, 1, 0, 0);
+        let rom = Rom::parse_nes_rom(data).expect("should parse header");
+        // mapper byte = 0 → Nrom, but prg_rom_size = 3 is invalid
+        assert!(rom.check_validity().is_err(), "NROM with 3 PRG units should be invalid");
+    }
+
+    // -----------------------------------------------------------------------
+    // 8. get_mapper_type returns MapperType::Nrom for mapper 0
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_get_mapper_type_nrom() {
+        let data = build_ines(1, 1, 0, 0);
+        let rom = Rom::parse_nes_rom(data).expect("should parse");
+        assert_eq!(rom.get_mapper_type(), MapperType::Nrom);
     }
 }

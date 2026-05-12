@@ -45,4 +45,41 @@ mod tests {
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
     }
+
+    #[test]
+    fn test_eor_zero_flag_set_when_result_is_zero() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.accumulator = 0xAB;
+        cpu.handle_eor(Some(0xAB), None);
+        assert_eq!(cpu.accumulator, 0x00);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
+    }
+
+    #[test]
+    fn test_eor_negative_flag_set_when_result_has_bit7() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        // 0x01 XOR 0x80 = 0x81 (bit 7 set)
+        cpu.accumulator = 0x01;
+        cpu.handle_eor(Some(0x80), None);
+        assert_eq!(cpu.accumulator, 0x81);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
+    }
+
+    #[test]
+    fn test_eor_with_zero_preserves_accumulator() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.accumulator = 0x55;
+        cpu.handle_eor(Some(0x00), None);
+        assert_eq!(cpu.accumulator, 0x55);
+    }
+
+    #[test]
+    fn test_eor_with_0xff_inverts_accumulator() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.accumulator = 0xA5;
+        cpu.handle_eor(Some(0xFF), None);
+        assert_eq!(cpu.accumulator, 0x5A);
+    }
 }

@@ -48,4 +48,50 @@ mod tests {
         // Check Interrupt Disable flag
         assert!(cpu.get_status_flag(StatusFlag::InterruptDisable), "Interrupt Disable flag should be set");
     }
+
+    #[test]
+    fn test_brk_sets_interrupt_disable_flag() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.set_status_flag(StatusFlag::InterruptDisable, false);
+        cpu.handle_brk(None, None);
+        assert!(cpu.get_status_flag(StatusFlag::InterruptDisable));
+    }
+
+    #[test]
+    fn test_brk_pushes_pc_plus_two() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.program_counter = 0x0200;
+        cpu.handle_brk(None, None);
+        // Status is on top; pop it first, then get the PC
+        let _status = cpu.pop_u8();
+        let pushed_pc = cpu.pop_u16();
+        assert_eq!(pushed_pc, 0x0202);
+    }
+
+    #[test]
+    fn test_brk_pushes_status_with_b_and_u_set() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        // Clear all flags to get a predictable baseline
+        cpu.status_register = 0x00;
+        cpu.handle_brk(None, None);
+        let pushed_status = cpu.pop_u8();
+        // B (bit 4) and U (bit 5) must be set in the pushed value
+        assert_ne!(pushed_status & (1 << 4), 0, "B flag should be set in pushed status");
+        assert_ne!(pushed_status & (1 << 5), 0, "U flag should be set in pushed status");
+    }
+
+    #[test]
+    fn test_brk_stack_pointer_decremented_by_three() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let initial_sp = cpu.stack_pointer;
+        cpu.handle_brk(None, None);
+        assert_eq!(cpu.stack_pointer, initial_sp.wrapping_sub(3));
+    }
+
+    #[test]
+    fn test_brk_returns_zero_extra_cycles() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let extra = cpu.handle_brk(None, None);
+        assert_eq!(extra, 0);
+    }
 }

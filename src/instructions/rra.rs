@@ -56,7 +56,8 @@ mod tests {
         cpu.accumulator = 0x01;
         cpu.set_status_flag(StatusFlag::Carry, true);
 
-        let _ = cpu.handle_rra(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_rra(Some(value), Some(addr));
 
         // rotated = (3 >> 1) | (1 << 7) = 0b1000_0001 = 0x81
         assert_eq!(cpu.read_u8(addr), 0x81);
@@ -73,7 +74,8 @@ mod tests {
         cpu.accumulator = 0x00;
         cpu.set_status_flag(StatusFlag::Carry, false); // old carry is 0
 
-        let _ = cpu.handle_rra(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_rra(Some(value), Some(addr));
 
         // rotated = (1 >> 1) | (0<<7) = 0
         assert_eq!(cpu.read_u8(addr), 0x00);
@@ -94,7 +96,8 @@ mod tests {
 
         // rotated = (0 >> 1) | (1 << 7) = 0x80
         // sum = 0xFF + 0x80 + carry_in(=rotation carry=0) -> if carry_in used would be 0 but here rotation carry = 0
-        let _ = cpu.handle_rra(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_rra(Some(value), Some(addr));
 
         // rotated written to memory
         assert_eq!(cpu.read_u8(addr), 0x80);

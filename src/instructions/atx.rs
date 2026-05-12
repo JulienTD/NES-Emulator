@@ -29,4 +29,26 @@ mod tests {
         assert!(!cpu.get_status_flag(StatusFlag::Zero));
         assert!(cpu.get_status_flag(StatusFlag::Negative));
     }
+
+    #[test]
+    fn test_atx_zero_flag_when_and_result_is_zero() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.accumulator = 0xF0;
+        let _ = cpu.handle_atx(Some(0x0F), None); // 0xF0 & 0x0F == 0
+        assert_eq!(cpu.accumulator, 0x00);
+        assert_eq!(cpu.x_register, 0x00);
+        assert!(cpu.get_status_flag(StatusFlag::Zero));
+        assert!(!cpu.get_status_flag(StatusFlag::Negative));
+    }
+
+    #[test]
+    fn test_atx_both_a_and_x_receive_same_result() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.accumulator = 0x3C;
+        let _ = cpu.handle_atx(Some(0xFF), None); // result == 0x3C
+        assert_eq!(cpu.accumulator, 0x3C);
+        assert_eq!(cpu.x_register, 0x3C);
+        assert!(!cpu.get_status_flag(StatusFlag::Zero));
+        assert!(!cpu.get_status_flag(StatusFlag::Negative));
+    }
 }

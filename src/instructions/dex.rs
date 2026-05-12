@@ -45,4 +45,43 @@ mod tests {
         assert_eq!(cpu.get_status_flag(StatusFlag::Zero), false);
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
     }
+
+    #[test]
+    fn test_dex_zero_flag_set_when_result_is_zero() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.x_register = 0x01;
+        cpu.handle_dex(None, None);
+        assert_eq!(cpu.x_register, 0x00);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
+    }
+
+    #[test]
+    fn test_dex_negative_flag_set_when_bit7_set() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        // 0x80 - 1 = 0x7F: bit 7 NOT set. Use wrap-around: 0x00 - 1 = 0xFF (bit 7 set).
+        cpu.x_register = 0x00;
+        cpu.handle_dex(None, None);
+        assert_eq!(cpu.x_register, 0xFF);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
+    }
+
+    #[test]
+    fn test_dex_wraps_around_from_zero_to_0xff() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.x_register = 0x00;
+        cpu.handle_dex(None, None);
+        assert_eq!(cpu.x_register, 0xFF);
+    }
+
+    #[test]
+    fn test_dex_does_not_affect_other_registers() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.x_register = 0x05;
+        cpu.accumulator = 0xAB;
+        cpu.y_register = 0xCD;
+        cpu.handle_dex(None, None);
+        assert_eq!(cpu.accumulator, 0xAB);
+        assert_eq!(cpu.y_register, 0xCD);
+    }
 }

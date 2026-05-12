@@ -31,4 +31,26 @@ mod tests {
         let _ = cpu.handle_aax(None, Some(addr));
         assert_eq!(cpu.read_u8(addr), 0x0B);
     }
+
+    #[test]
+    fn test_aax_stores_zero_when_no_bits_overlap() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let addr = 0x0210;
+        cpu.accumulator = 0xF0;
+        cpu.x_register = 0x0F;
+        // 0xF0 & 0x0F == 0x00
+        let _ = cpu.handle_aax(None, Some(addr));
+        assert_eq!(cpu.read_u8(addr), 0x00);
+    }
+
+    #[test]
+    fn test_aax_stores_negative_value() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let addr = 0x0220;
+        cpu.accumulator = 0xFF;
+        cpu.x_register = 0x80;
+        // 0xFF & 0x80 == 0x80 (bit 7 set)
+        let _ = cpu.handle_aax(None, Some(addr));
+        assert_eq!(cpu.read_u8(addr), 0x80);
+    }
 }

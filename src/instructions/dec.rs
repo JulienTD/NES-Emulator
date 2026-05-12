@@ -50,4 +50,43 @@ mod tests {
         assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
         assert_eq!(cpu.read_u8(addr), 0xFF);
     }
+
+    #[test]
+    fn test_dec_zero_flag_set_when_result_is_zero() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let addr = 0x0020;
+        cpu.handle_dec(Some(0x01), Some(addr));
+        assert_eq!(cpu.get_status_flag(StatusFlag::Zero), true);
+        assert_eq!(cpu.get_status_flag(StatusFlag::Negative), false);
+        assert_eq!(cpu.read_u8(addr), 0x00);
+    }
+
+    #[test]
+    fn test_dec_negative_flag_set_when_result_has_bit7() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let addr = 0x0020;
+        // 0x80 - 1 = 0x7F: bit 7 NOT set; use 0x00 - 1 = 0xFF (bit 7 set)
+        cpu.handle_dec(Some(0x00), Some(addr));
+        assert_eq!(cpu.get_status_flag(StatusFlag::Negative), true);
+        assert_eq!(cpu.read_u8(addr), 0xFF);
+    }
+
+    #[test]
+    fn test_dec_wraps_around_from_zero_to_0xff() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let addr = 0x0030;
+        cpu.handle_dec(Some(0x00), Some(addr));
+        assert_eq!(cpu.read_u8(addr), 0xFF);
+    }
+
+    #[test]
+    fn test_dec_writes_result_to_correct_address() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let addr = 0x0040;
+        let other_addr = 0x0050;
+        cpu.handle_dec(Some(0x05), Some(addr));
+        assert_eq!(cpu.read_u8(addr), 0x04);
+        // The other address should be untouched (default 0)
+        assert_eq!(cpu.read_u8(other_addr), 0x00);
+    }
 }

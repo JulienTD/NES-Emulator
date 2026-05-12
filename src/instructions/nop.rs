@@ -29,4 +29,28 @@ mod tests {
         assert_eq!(cpu.x_register, 0xBB, "X register should not change");
         assert_eq!(cpu.status_register, 0b11001100, "Status register should not change");
     }
+
+    #[test]
+    fn test_nop_does_not_change_program_counter() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.program_counter = 0x1234;
+        cpu.handle_nop(None, None);
+        assert_eq!(cpu.program_counter, 0x1234, "NOP should not modify the program counter directly");
+    }
+
+    #[test]
+    fn test_nop_does_not_change_stack_pointer() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        let initial_sp = cpu.stack_pointer;
+        cpu.handle_nop(None, None);
+        assert_eq!(cpu.stack_pointer, initial_sp, "NOP should not modify the stack pointer");
+    }
+
+    #[test]
+    fn test_nop_does_not_change_y_register() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        cpu.y_register = 0xCC;
+        cpu.handle_nop(None, None);
+        assert_eq!(cpu.y_register, 0xCC, "NOP should not modify the Y register");
+    }
 }

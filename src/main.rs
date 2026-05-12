@@ -2,6 +2,7 @@ pub mod cpu6502;
 pub mod instructions;
 pub mod rom;
 pub mod bus;
+pub mod ppu;
 
 use crate::cpu6502::trace;
 use crate::cpu6502::{CPU};

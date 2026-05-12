@@ -32,7 +32,8 @@ mod tests {
         cpu.write_u8(addr, 0x05);
         cpu.accumulator = 0x06;
 
-        let _ = cpu.handle_dcp(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_dcp(Some(value), Some(addr));
 
         assert_eq!(cpu.read_u8(addr), 0x04);
         // 0x06 - 0x04 = 0x02 -> not zero, carry set
@@ -48,7 +49,8 @@ mod tests {
         // after decrement memory -> 0x04
         cpu.accumulator = 0x04;
 
-        let _ = cpu.handle_dcp(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_dcp(Some(value), Some(addr));
 
         assert_eq!(cpu.read_u8(addr), 0x04);
         // A == M -> zero set, carry set
@@ -64,7 +66,8 @@ mod tests {
         cpu.write_u8(addr, 0x81);
         cpu.accumulator = 0x00;
 
-        let _ = cpu.handle_dcp(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_dcp(Some(value), Some(addr));
 
         assert_eq!(cpu.read_u8(addr), 0x80);
         // 0 - 0x80 = 0x80 -> negative set, carry cleared

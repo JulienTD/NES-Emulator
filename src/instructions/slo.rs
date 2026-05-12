@@ -38,7 +38,8 @@ mod tests {
         cpu.write_u8(addr, 0b0100_0000);
         cpu.accumulator = 0b0000_0001;
 
-        let _ = cpu.handle_slo(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_slo(Some(value), Some(addr));
         // rotated = 0b1000_0000
         assert_eq!(cpu.read_u8(addr), 0b1000_0000);
         // accumulator OR rotated = 0b1000_0001
@@ -56,7 +57,8 @@ mod tests {
         cpu.write_u8(addr, 0b1000_0000); // bit7 set
         cpu.accumulator = 0x00;
 
-        let _ = cpu.handle_slo(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_slo(Some(value), Some(addr));
 
         // rotated = 0b0000_0000 (shifted left) then OR with accumulator leaves 0
         assert_eq!(cpu.read_u8(addr), 0b0000_0000);

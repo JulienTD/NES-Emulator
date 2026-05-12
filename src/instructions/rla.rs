@@ -42,7 +42,8 @@ mod tests {
         cpu.accumulator = 0b1111_1111;
         cpu.set_status_flag(StatusFlag::Carry, 1 == 1); // set carry -> 1
 
-        let _ = cpu.handle_rla(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_rla(Some(value), Some(addr));
 
         // rotated = (0b0100_0000 << 1) | 1 = 0b1000_0001
         assert_eq!(cpu.read_u8(addr), 0b1000_0001);
@@ -61,7 +62,8 @@ mod tests {
         cpu.accumulator = 0b1111_1111;
         cpu.set_status_flag(StatusFlag::Carry, false);
 
-        let _ = cpu.handle_rla(Some(cpu.read_u8(addr)), Some(addr));
+        let value = cpu.read_u8(addr);
+        let _ = cpu.handle_rla(Some(value), Some(addr));
 
         // rotated = (0b1000_0000 << 1) | 0 = 0b0000_0000
         assert_eq!(cpu.read_u8(addr), 0b0000_0000);

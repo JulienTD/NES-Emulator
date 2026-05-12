@@ -36,4 +36,36 @@ mod tests {
         assert_eq!(cpu.accumulator, 0b0000_0001);
         assert!(cpu.get_status_flag(StatusFlag::Carry));
     }
+
+    #[test]
+    fn test_asr_zero_flag_when_result_is_zero() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        // AND result is 0 -> shift produces 0
+        cpu.accumulator = 0xAA; // 0b1010_1010
+        let _ = cpu.handle_asr(Some(0x55), None); // 0b0101_0101 -> AND = 0, no carry
+        assert_eq!(cpu.accumulator, 0x00);
+        assert!(cpu.get_status_flag(StatusFlag::Zero));
+        assert!(!cpu.get_status_flag(StatusFlag::Carry));
+    }
+
+    #[test]
+    fn test_asr_carry_cleared_when_bit0_of_and_result_is_zero() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        // AND result with bit0=0 => carry cleared, result shifts to 0 from 0x02
+        cpu.accumulator = 0xFF;
+        let _ = cpu.handle_asr(Some(0x02), None); // temp = 0x02 (bit0=0), result = 0x01
+        assert_eq!(cpu.accumulator, 0x01);
+        assert!(!cpu.get_status_flag(StatusFlag::Carry));
+        assert!(!cpu.get_status_flag(StatusFlag::Zero));
+    }
+
+    #[test]
+    fn test_asr_negative_flag_never_set_after_right_shift() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        // LSR always puts 0 into bit7, so Negative should never be set
+        cpu.accumulator = 0xFF;
+        let _ = cpu.handle_asr(Some(0xFF), None); // temp=0xFF, result=0x7F
+        assert_eq!(cpu.accumulator, 0x7F);
+        assert!(!cpu.get_status_flag(StatusFlag::Negative));
+    }
 }

@@ -32,4 +32,30 @@ mod tests {
         let _ = cpu.handle_xaa(Some(0x0B), None);
         assert_eq!(cpu.accumulator, 0x0B);
     }
+
+    #[test]
+    fn test_xaa_zero_flag_when_result_is_zero() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        use crate::cpu6502::StatusFlag;
+        cpu.accumulator = 0xFF;
+        cpu.x_register = 0x0F;
+        // 0xFF & 0x0F = 0x0F; 0x0F & 0xF0 = 0x00
+        let _ = cpu.handle_xaa(Some(0xF0), None);
+        assert_eq!(cpu.accumulator, 0x00);
+        assert!(cpu.get_status_flag(StatusFlag::Zero));
+        assert!(!cpu.get_status_flag(StatusFlag::Negative));
+    }
+
+    #[test]
+    fn test_xaa_negative_flag_when_bit7_set() {
+        let mut cpu = new_cpu(Bus::new(Rom::test_rom()));
+        use crate::cpu6502::StatusFlag;
+        cpu.accumulator = 0xFF;
+        cpu.x_register = 0xFF;
+        // 0xFF & 0xFF & 0x80 = 0x80
+        let _ = cpu.handle_xaa(Some(0x80), None);
+        assert_eq!(cpu.accumulator, 0x80);
+        assert!(cpu.get_status_flag(StatusFlag::Negative));
+        assert!(!cpu.get_status_flag(StatusFlag::Zero));
+    }
 }
