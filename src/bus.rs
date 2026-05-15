@@ -12,12 +12,21 @@ use crate::ppu::PPU;
 // 0x8000 - 0xFFFF: PRG ROM
 // Total memory size: 64KB; 0xFFFF + 1 = 65536 bytes = 0x10000 to include all addresses.
 
-#[derive(Debug)]
 pub(crate) struct Bus {
     internal_ram: [u8; 0x0800], // 2KB internal RAM (0x0000 - 0x07FF)
     rom: Rom,
     ppu: PPU,
     cycles: usize,
+    nmi_callback: Option<Box<dyn FnMut(&PPU)>>,
+}
+
+impl std::fmt::Debug for Bus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Bus")
+            .field("cycles", &self.cycles)
+            .field("ppu", &self.ppu)
+            .finish()
+    }
 }
 
 impl Bus {
@@ -30,12 +39,29 @@ impl Bus {
             rom,
             ppu: PPU::new(chr_rom, mirroring),
             cycles: 0,
+            nmi_callback: None,
         }
+    }
+
+    pub fn set_nmi_callback(&mut self, callback: impl FnMut(&PPU) + 'static) {
+        self.nmi_callback = Some(Box::new(callback));
     }
 
     pub fn tick(&mut self, cycles: u8) {
         self.cycles += cycles as usize;
-        // PPU ticks at 3x CPU clock rate — wire up when PPU timing is implemented
+        let nmi_before = self.ppu.nmi_interrupt.is_some();
+        self.ppu.tick(cycles * 3);
+        let nmi_after = self.ppu.nmi_interrupt.is_some();
+        if !nmi_before && nmi_after {
+            if let Some(mut cb) = self.nmi_callback.take() {
+                cb(&self.ppu);
+                self.nmi_callback = Some(cb);
+            }
+        }
+    }
+
+    pub fn poll_nmi_status(&mut self) -> Option<u8> {
+        self.ppu.nmi_interrupt.take()
     }
 
     pub fn read_u8(&mut self, mut addr: u16) -> u8 {
@@ -58,16 +84,16 @@ impl Bus {
             //     todo!("PPU is not supported yet")
             // }
 
-            0x2000 | 0x2001 | 0x2003 | 0x2005 | 0x2006 | 0x4014 => {
-                panic!("Attempt to read from write-only PPU address {:x}", addr);
+            0x2001 | 0x2003 | 0x2005 | 0x2006 | 0x4014 => {
+                0 // write-only registers return open-bus on real hardware
             }
             0x2002 => self.ppu.read_status(),
             0x2004 => self.ppu.oam_data(),
             0x2007 => self.ppu.read_data(),
 
             0x2008..=0x3FFF => {
-                let mirror_down_addr = addr & 0b00100000_00000111;
-                self.internal_ram[mirror_down_addr as usize]
+                let mirror_down_addr = addr & 0x2007;
+                self.read_u8(mirror_down_addr)
             }
 
 
@@ -105,8 +131,8 @@ impl Bus {
             }
 
             0x2000 => {
-                // self.ppu.write_to_ctrl(data);
-                self.ppu.ppu_ctrl = data;
+                self.ppu.write_to_ctrl(data);
+                // self.ppu.ppu_ctrl = data;
             }
 
             0x2001 => {
@@ -140,8 +166,8 @@ impl Bus {
             }
 
             0x2008..=0x3FFF => {
-                let mirror_down_addr = addr & 0b00100000_00000111;
-                self.internal_ram[mirror_down_addr as usize] = data;
+                let mirror_down_addr = addr & 0x2007;
+                self.write_u8(mirror_down_addr, data);
             }
 
             // Cartridge Space

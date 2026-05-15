@@ -35,13 +35,13 @@ pub(crate) struct PPU {
     pub oam_dma: u8,
 
     // PPU Internal memory and state
-    chr_rom: Vec<u8>, // Character ROM (CHR ROM) from the cartridge
+    pub chr_rom: Vec<u8>, // Character ROM (CHR ROM) from the cartridge
 
-    vram: [u8; 0x800], // 2KB of VRAM for nametables and attribute tables
+    pub vram: [u8; 0x800], // 2KB of VRAM for nametables and attribute tables
 
-    palette_table: [u8; 32], // 32 bytes for background and sprite palettes
+    pub palette_table: [u8; 32], // 32 bytes for background and sprite palettes
 
-    mirroring: Mirroring, // Mirroring type for nametable addressing
+    pub mirroring: Mirroring, // Mirroring type for nametable addressing
 
     /// Internal states
     ppu_addr_latch: bool, // Latch for tracking first/second write to $2005/$2006
@@ -49,6 +49,8 @@ pub(crate) struct PPU {
 
     scanline: u16,
     cycles: usize,
+    pub nmi_interrupt: Option<u8>,
+
 }
 
 // Each flag corresponds to a bit in the control register
@@ -108,19 +110,8 @@ impl PPU {
             internal_data_buf: 0,
             scanline: 0,
             cycles: 0,
+            nmi_interrupt: None,
         }
-    }
-
-    pub(crate) fn set_register_flag(& mut self, register: &mut u8, flag: u8, value: bool) {
-        if value {
-            *register |= 1 << flag;
-        } else {
-            *register &= !(1 << flag);
-        }
-    }
-
-    pub(crate) fn get_register_flag(&self, register: &u8, flag: u8) -> bool {
-        (*register & (1 << flag)) != 0
     }
 
     pub fn write_ppu_address(&mut self, data: u8) {
@@ -141,7 +132,7 @@ impl PPU {
         // After reading, the PPU address should increment by either 1 or 32 depending on the increment mode set in PPUCTRL.
         // if self.ppu_ctrl & 0b00000100 == 0 {
         let ctrl = self.ppu_ctrl;
-        if self.get_register_flag(&ctrl, ControlFlag::VramAddIncrement as u8) {
+        if get_register_flag(&ctrl, ControlFlag::VramAddIncrement as u8) {
             self.ppu_addr = self.ppu_addr.wrapping_add(32);
         } else {
             self.ppu_addr = self.ppu_addr.wrapping_add(1);
@@ -191,12 +182,20 @@ impl PPU {
         status
     }
 
+    pub fn write_to_ctrl(&mut self, data: u8) {
+        let before_nmi_status = get_register_flag(&self.ppu_ctrl, ControlFlag::GenerateNMI as u8);
+        self.ppu_ctrl = data;
+        if !before_nmi_status && get_register_flag(&self.ppu_ctrl, ControlFlag::GenerateNMI as u8) && get_register_flag(&self.ppu_status, StatusFlag::Vblank as u8) {
+            self.nmi_interrupt = Some(1);
+        }
+    }
+
     pub fn write_to_data(&mut self, data: u8) {
         let addr = self.ppu_addr;
 
         // Auto-increment ppu_addr after every write (same rule as reads)
         let ctrl = self.ppu_ctrl;
-        if self.get_register_flag(&ctrl, ControlFlag::VramAddIncrement as u8) {
+        if get_register_flag(&ctrl, ControlFlag::VramAddIncrement as u8) {
             self.ppu_addr = self.ppu_addr.wrapping_add(32);
         } else {
             self.ppu_addr = self.ppu_addr.wrapping_add(1);
@@ -241,10 +240,53 @@ impl PPU {
             Mirroring::FourScreen => addr,
         }
     }
+
+   pub fn tick(&mut self, cycles: u8) -> bool {
+       self.cycles += cycles as usize;
+       while self.cycles >= 341 {
+           self.cycles -= 341;
+           self.scanline += 1;
+
+           if self.scanline == 241 {
+               set_register_flag(&mut self.ppu_status, StatusFlag::Vblank as u8, true);
+               if get_register_flag(&self.ppu_ctrl, ControlFlag::GenerateNMI as u8) {
+                   self.nmi_interrupt = Some(1);
+               }
+           }
+
+           if self.scanline == 261 {
+               set_register_flag(&mut self.ppu_status, StatusFlag::Sprite0Hit as u8, false);
+               set_register_flag(&mut self.ppu_status, StatusFlag::Vblank as u8, false);
+           }
+
+           if self.scanline >= 262 {
+               self.scanline = 0;
+               return true;
+           }
+       }
+       false
+   }
+
+    fn poll_nmi_interrupt(&mut self) -> Option<u8> {
+        self.nmi_interrupt.take()
+    }
+
 }
 
 // $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C respectively.
 fn palette_addr(addr: u16) -> usize {
     let idx = (addr - 0x3F00) as usize % 32;
     if idx >= 0x10 && idx % 4 == 0 { idx - 0x10 } else { idx }
+}
+
+pub(crate) fn get_register_flag(register: &u8, flag: u8) -> bool {
+    (*register & (1 << flag)) != 0
+}
+
+pub(crate) fn set_register_flag(register: &mut u8, flag: u8, value: bool) {
+    if value {
+        *register |= 1 << flag;
+    } else {
+        *register &= !(1 << flag);
+    }
 }

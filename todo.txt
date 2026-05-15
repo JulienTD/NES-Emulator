@@ -1,0 +1,40 @@
+● Here's the natural build order for a working emulator:
+
+  ---
+  1. PPU Timing + NMI (most critical)
+  
+  The PPU tick() is currently commented out. Without it, the PPU never signals VBlank and never fires NMI — so any game that uses NMI as its main loop (the
+  vast majority) will just hang at startup.
+
+  - 341 PPU cycles per scanline, 262 scanlines per frame
+  - Set VBlank flag ($2002 bit 7) at scanline 241
+  - Trigger NMI to the CPU when VBlank starts (if PPUCTRL bit 7 is set)
+  - Clear VBlank at scanline 261 (pre-render line)
+
+  2. PPU Background Rendering
+
+  Once NMI fires and games are advancing, you need pixels on screen:
+
+  - Fetch tiles from nametable (VRAM) + pattern table (CHR ROM)
+  - Apply palette to produce a colour index per pixel
+  - Output a 256×240 frame buffer
+
+  3. OAM DMA ($4014)
+
+  Most games copy sprites via DMA write to $4014. Currently the bus silently ignores it. Without it, no sprites.
+
+  4. Controller Input ($4016/$4017)
+
+  Currently returns open-bus. Games that poll the controller before proceeding will loop forever. A basic single-player digital pad (8 buttons, shift-register
+  protocol) is straightforward to add.
+
+  5. Additional Mappers
+
+  Mapper 0 covers ~10% of the library. Adding mappers 1 (MMC1), 2 (UxROM), and 4 (MMC3) gets you to ~75% coverage.
+
+  6. APU (Audio)
+
+  Last major piece. Not needed for visual gameplay but required for sound.
+
+  ---
+  The shortest path to seeing a game run: PPU timing → NMI → background rendering → OAM DMA → input. Want to start with PPU timing and NMI?

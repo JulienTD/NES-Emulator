@@ -636,6 +636,20 @@ impl CPU {
         (addr1 & 0xFF00) != (addr2 & 0xFF00)
     }
 
+   fn interrupt_nmi(&mut self) {
+       self.push_u16(self.program_counter);
+       let mut flag = self.status_register.clone();
+
+       flag |= 1 << (StatusFlag::Unused as u8);
+       flag &= !(1 << (StatusFlag::BreakCommand as u8));
+
+       self.push_u8(flag);
+       self.set_status_flag(StatusFlag::InterruptDisable, true);
+
+       self.bus.tick(2);
+       self.program_counter = self.read_u16(0xfffA);
+   }
+
     pub fn run(& mut self) {
                 self.run_with_callback(|_| {});
     }
@@ -648,7 +662,12 @@ impl CPU {
             if self.halted {
                 break;
             }
+            if let Some(_nmi) = self.bus.poll_nmi_status() {
+               self.interrupt_nmi();
+            }
+
             callback(self);
+
             let pc_before_instruction = self.program_counter;
             let opcode = self.read_u8(pc_before_instruction);
             // println!("PC: {:04X} Opcode: {:02X}", pc_before_instruction, opcode);
